@@ -13,6 +13,7 @@
 #include "DataStructures/DataBox/Tag.hpp"
 #include "DataStructures/DataBox/TagName.hpp"
 #include "DataStructures/DataVector.hpp"
+#include "DataStructures/Tensor/Tensor.hpp"
 #include "PointwiseFunctions/GeneralRelativity/TagsDeclarations.hpp"  // IWYU pragma: keep
 #include "Utilities/ForceInline.hpp"
 #include "Utilities/Gsl.hpp"
@@ -324,6 +325,23 @@ struct SurfaceIntegral : db::ComputeTag {
   static constexpr auto function = surface_integral_of_scalar<Frame>;
   using argument_tags = tmpl::list<AreaElement<Frame>, IntegrandTag,
                                    StrahlkorperTags::Strahlkorper<Frame>>;
+};
+
+struct Area : db::SimpleTag {
+  static std::string name() noexcept { return "Area"; }
+  using type = double;
+};
+
+template <typename Frame>
+struct AreaCompute : Area, db::ComputeTag {
+  static std::string name() noexcept { return "AreaCompute"; }
+  static double function(const Strahlkorper<Frame>& strahlkorper,
+                         const Scalar<DataVector>& area_element) noexcept {
+    return strahlkorper.ylm_spherepack().definite_integral(
+        get(area_element).data());
+  }
+  using argument_tags =
+      tmpl::list<StrahlkorperTags::Strahlkorper<Frame>, AreaElement<Frame>>;
 };
 
 }  // namespace Tags
