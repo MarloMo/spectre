@@ -326,12 +326,13 @@ struct SurfaceIntegral : db::ComputeTag {
   using argument_tags = tmpl::list<AreaElement<Frame>, IntegrandTag,
                                    StrahlkorperTags::Strahlkorper<Frame>>;
 };
-
+/// Tag representing the surface area of a Strahlkorper
 struct Area : db::SimpleTag {
   static std::string name() noexcept { return "Area"; }
   using type = double;
 };
-
+/// Computes the surface area of a Strahlkorer, \f$A = \oint_S dA\f$ given an
+/// AreaElement \f$dA\f$ and a Strahlkorper \f$S\f$.
 template <typename Frame>
 struct AreaCompute : Area, db::ComputeTag {
   static std::string name() noexcept { return "AreaCompute"; }
