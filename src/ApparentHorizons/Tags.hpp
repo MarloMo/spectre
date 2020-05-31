@@ -328,7 +328,6 @@ struct SurfaceIntegral : db::ComputeTag {
 };
 /// Tag representing the surface area of a Strahlkorper
 struct Area : db::SimpleTag {
-  static std::string name() noexcept { return "Area"; }
   using type = double;
 };
 /// Computes the surface area of a Strahlkorer, \f$A = \oint_S dA\f$ given an
