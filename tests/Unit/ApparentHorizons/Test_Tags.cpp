@@ -33,7 +33,6 @@ auto create_strahlkorper_y11(const double y11_amplitude, const double radius,
   static const size_t l_max = 4;
   static const size_t m_max = 4;
 
-  // make clang happy
   Strahlkorper<Frame::Inertial> strahlkorper_sphere(l_max, m_max, radius,
                                                     center);
 
