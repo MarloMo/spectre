@@ -334,7 +334,7 @@ struct Area : db::SimpleTag {
 /// AreaElement \f$dA\f$ and a Strahlkorper \f$S\f$.
 template <typename Frame>
 struct AreaCompute : Area, db::ComputeTag {
-  static std::string name() noexcept { return "AreaCompute"; }
+  using base = Area;
   static double function(const Strahlkorper<Frame>& strahlkorper,
                          const Scalar<DataVector>& area_element) noexcept {
     return strahlkorper.ylm_spherepack().definite_integral(
