@@ -39,6 +39,11 @@ template <typename Frame>
 struct Area;
 template <typename Frame>
 struct AreaCompute;
+template <typename Frame>
+struct IrreducibleMass;
+template <typename Frame>
+struct IrreducibleMassCompute;
+
 }  // namespace StrahlkorperTags
 
 namespace StrahlkorperGr {
