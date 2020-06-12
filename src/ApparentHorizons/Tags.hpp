@@ -344,5 +344,17 @@ struct AreaCompute : Area, db::ComputeTag {
       tmpl::list<StrahlkorperTags::Strahlkorper<Frame>, AreaElement<Frame>>;
 };
 
+struct IrreducibleMass : db::SimpleTag {
+  static std::string name() noexcept { return "IrreducibleMass"; }
+  using type = double;
+};
+
+template <typename Frame>
+struct IrreducibleMassCompute : IrreducibleMass, db::ComputeTag {
+  static std::string name() noexcept { return "IrreducibleMassCompute"; }
+  static constexpr auto function = ::StrahlkorperGr::irreducible_mass;
+
+  using argument_tags = tmpl::list<AreaCompute<Frame>>;
+};
 }  // namespace Tags
 }  // namespace StrahlkorperGr
