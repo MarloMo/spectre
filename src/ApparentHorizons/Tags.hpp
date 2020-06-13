@@ -343,12 +343,12 @@ struct AreaCompute : Area, db::ComputeTag {
   using argument_tags =
       tmpl::list<StrahlkorperTags::Strahlkorper<Frame>, AreaElement<Frame>>;
 };
-
+/// The Irreducible (areal) mass of an apparent horizon
 struct IrreducibleMass : db::SimpleTag {
   static std::string name() noexcept { return "IrreducibleMass"; }
   using type = double;
 };
-
+/// Computes the Irreducible mass of an apparent horizon from its area
 template <typename Frame>
 struct IrreducibleMassCompute : IrreducibleMass, db::ComputeTag {
   static std::string name() noexcept { return "IrreducibleMassCompute"; }
