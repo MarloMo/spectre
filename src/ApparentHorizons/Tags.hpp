@@ -369,7 +369,10 @@ struct IrreducibleMass : db::SimpleTag {
 template <typename Frame>
 struct IrreducibleMassCompute : IrreducibleMass, db::ComputeTag {
   using base = IrreducibleMass;
-  static constexpr auto function = ::StrahlkorperGr::irreducible_mass;
+  static void function(const gsl::not_null<double *> result,
+                       const double area) noexcept {
+    *result = ::StrahlkorperGr::irreducible_mass(area);
+  }
 
   using argument_tags = tmpl::list<Area>;
 };
