@@ -344,6 +344,11 @@ struct UnitNormalVectorCompute : UnitNormalVector<Frame>, db::ComputeTag {
   using return_type = tnsr::I<DataVector, 3, Frame>;
 };
 
+struct HorizonRicciScalar : db::SimpleTag {
+  static std::string name() noexcept { return "HorizonRicciScalar"; }
+  using type = Scalar<DataVector>;
+};
+
 // @{
 /// `Tangents(i,j)` is \f$\partial x_{\rm surf}^i/\partial q^j\f$,
 /// where \f$x_{\rm surf}^i\f$ are the Cartesian coordinates of the
