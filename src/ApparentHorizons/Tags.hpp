@@ -345,8 +345,16 @@ struct UnitNormalVectorCompute : UnitNormalVector<Frame>, db::ComputeTag {
 };
 
 struct HorizonRicciScalar : db::SimpleTag {
-  static std::string name() noexcept { return "HorizonRicciScalar"; }
   using type = Scalar<DataVector>;
+};
+
+template <typename Frame>
+struct HorizonRicciScalarCompute : HorizonRicciScalar, db::ComputeTag {
+  static constexpr auto function = &StrahlkorperGr::ricci_scalar<Frame>;
+  using argument_tags =
+      tmpl::list<gr::Tags::RicciTensor<3, Frame, DataVector>,
+                 UnitNormalVector<Frame>, ExtrinsicCurvature<Frame>,
+                 gr::Tags::InverseSpatialMetric<3, Frame, DataVector>>;
 };
 
 // @{
