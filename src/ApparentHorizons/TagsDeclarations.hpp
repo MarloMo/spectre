@@ -46,6 +46,9 @@ template <typename Frame>
 struct UnitNormalVector;
 template <typename Frame>
 struct UnitNormalVectorCompute;
+struct SpatialRicciScalar;
+template <typename Frame>
+struct SpatialRicciScalarCompute;
 
 }  // namespace StrahlkorperTags
 
