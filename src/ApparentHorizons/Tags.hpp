@@ -344,11 +344,12 @@ struct UnitNormalVectorCompute : UnitNormalVector<Frame>, db::ComputeTag {
   using return_type = tnsr::I<DataVector, 3, Frame>;
 };
 
-///
+/////SpatialRicciScalar is the two-dimensional intrinic Ricci scalar curvature
+/// of a Strahlkorper
 struct SpatialRicciScalar : db::SimpleTag {
   using type = Scalar<DataVector>;
 };
-///
+/// Computes the two-dimensional intrinsic Ricci scalar of a Strahlkorper
 template <typename Frame>
 struct SpatialRicciScalarCompute : SpatialRicciScalar, db::ComputeTag {
   using base = SpatialRicciScalar;
