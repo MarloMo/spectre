@@ -344,7 +344,7 @@ struct UnitNormalVectorCompute : UnitNormalVector<Frame>, db::ComputeTag {
   using return_type = tnsr::I<DataVector, 3, Frame>;
 };
 
-/////SpatialRicciScalar is the two-dimensional intrinic Ricci scalar curvature
+///SpatialRicciScalar is the two-dimensional intrinic Ricci scalar curvature
 /// of a Strahlkorper
 struct SpatialRicciScalar : db::SimpleTag {
   using type = Scalar<DataVector>;
