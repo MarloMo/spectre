@@ -599,5 +599,23 @@ struct IrreducibleMassCompute : IrreducibleMass, db::ComputeTag {
 
   using argument_tags = tmpl::list<Area>;
 };
+
+/// Calculates the spin function, \f$\Omega\f$, a component of the spin
+/// vector.
+
+struct SpinFunction : db::SimpleTag {
+  using type = Scalar<DataVector>;
+};
+
+template <typename Frame>
+struct SpinFunctionCompute : SpinFunction, db::ComputeTag {
+  static constexpr auto function = &StrahlkorperGr::spin_function<Frame>;
+  using argument_tags =
+      tmpl::list<StrahlkorperTags::Tangents<Frame>,
+                 StrahlkorperTags::Strahlkorper<Frame>,
+                 StrahlkorperTags::UnitNormalVector<Frame>, AreaElement<Frame>,
+                 gr::Tags::ExtrinsicCurvature<3, Frame, DataVector>>;
+};
+
 }  // namespace Tags
 }  // namespace StrahlkorperGr
