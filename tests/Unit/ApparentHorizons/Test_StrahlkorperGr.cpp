@@ -11,14 +11,14 @@
 
 #include "ApparentHorizons/Strahlkorper.hpp"
 #include "ApparentHorizons/StrahlkorperGr.hpp"
-#include "ApparentHorizons/Tags.hpp"  // IWYU pragma: keep
+#include "ApparentHorizons/Tags.hpp" // IWYU pragma: keep
 #include "ApparentHorizons/YlmSpherepack.hpp"
 #include "DataStructures/DataBox/DataBox.hpp"
-#include "DataStructures/DataBox/Prefixes.hpp"  // IWYU pragma: keep
+#include "DataStructures/DataBox/Prefixes.hpp" // IWYU pragma: keep
 #include "DataStructures/DataVector.hpp"
 #include "DataStructures/Tensor/EagerMath/DeterminantAndInverse.hpp"
-#include "DataStructures/Tensor/EagerMath/DotProduct.hpp"  // IWYU pragma: keep
-#include "DataStructures/Tensor/EagerMath/Magnitude.hpp"   // IWYU prgma: keep
+#include "DataStructures/Tensor/EagerMath/DotProduct.hpp" // IWYU pragma: keep
+#include "DataStructures/Tensor/EagerMath/Magnitude.hpp"  // IWYU prgma: keep
 #include "DataStructures/Tensor/Tensor.hpp"
 #include "Framework/TestHelpers.hpp"
 #include "Helpers/ApparentHorizons/StrahlkorperGrTestHelpers.hpp"
@@ -44,43 +44,44 @@
 
 namespace {
 template <typename Solution, typename Fr, typename ExpectedLambda>
-void test_expansion(const Solution& solution,
-                    const Strahlkorper<Fr>& strahlkorper,
-                    const ExpectedLambda& expected) noexcept {
+void test_expansion(const Solution &solution,
+                    const Strahlkorper<Fr> &strahlkorper,
+                    const ExpectedLambda &expected) noexcept {
   // Make databox from surface
   const auto box = db::create<
-      db::AddSimpleTags<StrahlkorperTags::items_tags<Frame::Inertial>>,
+      db::AddSimpleTags<StrahlkorperTags::items_tags<Frame::Inertial> >,
       db::AddComputeTags<
-          StrahlkorperTags::compute_items_tags<Frame::Inertial>>>(strahlkorper);
+          StrahlkorperTags::compute_items_tags<Frame::Inertial> > >(
+      strahlkorper);
 
   const double t = 0.0;
-  const auto& cart_coords =
-      db::get<StrahlkorperTags::CartesianCoords<Frame::Inertial>>(box);
+  const auto &cart_coords =
+      db::get<StrahlkorperTags::CartesianCoords<Frame::Inertial> >(box);
 
   const auto vars = solution.variables(
       cart_coords, t, typename Solution::template tags<DataVector>{});
 
-  const auto& spatial_metric =
-      get<gr::Tags::SpatialMetric<3, Frame::Inertial, DataVector>>(vars);
-  const auto& deriv_spatial_metric =
+  const auto &spatial_metric =
+      get<gr::Tags::SpatialMetric<3, Frame::Inertial, DataVector> >(vars);
+  const auto &deriv_spatial_metric =
       get<Tags::deriv<gr::Tags::SpatialMetric<3, Frame::Inertial, DataVector>,
-                      tmpl::size_t<3>, Frame::Inertial>>(vars);
+                      tmpl::size_t<3>, Frame::Inertial> >(vars);
   const auto inverse_spatial_metric =
       determinant_and_inverse(spatial_metric).second;
 
   const DataVector one_over_one_form_magnitude =
       1.0 / get(magnitude(
-                db::get<StrahlkorperTags::NormalOneForm<Frame::Inertial>>(box),
+                db::get<StrahlkorperTags::NormalOneForm<Frame::Inertial> >(box),
                 inverse_spatial_metric));
   const auto unit_normal_one_form = StrahlkorperGr::unit_normal_one_form(
-      db::get<StrahlkorperTags::NormalOneForm<Frame::Inertial>>(box),
+      db::get<StrahlkorperTags::NormalOneForm<Frame::Inertial> >(box),
       one_over_one_form_magnitude);
   const auto grad_unit_normal_one_form =
       StrahlkorperGr::grad_unit_normal_one_form(
-          db::get<StrahlkorperTags::Rhat<Frame::Inertial>>(box),
-          db::get<StrahlkorperTags::Radius<Frame::Inertial>>(box),
+          db::get<StrahlkorperTags::Rhat<Frame::Inertial> >(box),
+          db::get<StrahlkorperTags::Radius<Frame::Inertial> >(box),
           unit_normal_one_form,
-          db::get<StrahlkorperTags::D2xRadius<Frame::Inertial>>(box),
+          db::get<StrahlkorperTags::D2xRadius<Frame::Inertial> >(box),
           one_over_one_form_magnitude,
           raise_or_lower_first_index(
               gr::christoffel_first_kind(deriv_spatial_metric),
@@ -92,13 +93,13 @@ void test_expansion(const Solution& solution,
   const auto residual = StrahlkorperGr::expansion(
       grad_unit_normal_one_form, inverse_surface_metric,
       gr::extrinsic_curvature(
-          get<gr::Tags::Lapse<DataVector>>(vars),
-          get<gr::Tags::Shift<3, Frame::Inertial, DataVector>>(vars),
+          get<gr::Tags::Lapse<DataVector> >(vars),
+          get<gr::Tags::Shift<3, Frame::Inertial, DataVector> >(vars),
           get<Tags::deriv<gr::Tags::Shift<3, Frame::Inertial, DataVector>,
-                          tmpl::size_t<3>, Frame::Inertial>>(vars),
+                          tmpl::size_t<3>, Frame::Inertial> >(vars),
           spatial_metric,
           get<Tags::dt<
-              gr::Tags::SpatialMetric<3, Frame::Inertial, DataVector>>>(vars),
+              gr::Tags::SpatialMetric<3, Frame::Inertial, DataVector> > >(vars),
           deriv_spatial_metric));
 
   Approx custom_approx = Approx::custom().epsilon(1.e-12).scale(1.0);
@@ -110,45 +111,44 @@ namespace TestExtrinsicCurvature {
 void test_minkowski() {
   // Make surface of radius 2.
   const auto box = db::create<
-      db::AddSimpleTags<StrahlkorperTags::items_tags<Frame::Inertial>>,
+      db::AddSimpleTags<StrahlkorperTags::items_tags<Frame::Inertial> >,
       db::AddComputeTags<
-          StrahlkorperTags::compute_items_tags<Frame::Inertial>>>(
-      Strahlkorper<Frame::Inertial>(8, 8, 2.0, {{0.0, 0.0, 0.0}}));
+          StrahlkorperTags::compute_items_tags<Frame::Inertial> > >(
+      Strahlkorper<Frame::Inertial>(8, 8, 2.0, { { 0.0, 0.0, 0.0 } }));
 
   const double t = 0.0;
-  const auto& cart_coords =
-      db::get<StrahlkorperTags::CartesianCoords<Frame::Inertial>>(box);
+  const auto &cart_coords =
+      db::get<StrahlkorperTags::CartesianCoords<Frame::Inertial> >(box);
 
   gr::Solutions::Minkowski<3> solution{};
 
   const auto deriv_spatial_metric =
       get<Tags::deriv<gr::Tags::SpatialMetric<3, Frame::Inertial, DataVector>,
-                      tmpl::size_t<3>, Frame::Inertial>>(
+                      tmpl::size_t<3>, Frame::Inertial> >(
           solution.variables(
               cart_coords, t,
               tmpl::list<Tags::deriv<
                   gr::Tags::SpatialMetric<3, Frame::Inertial, DataVector>,
-                  tmpl::size_t<3>, Frame::Inertial>>{}));
+                  tmpl::size_t<3>, Frame::Inertial> >{}));
   const auto inverse_spatial_metric =
-      get<gr::Tags::InverseSpatialMetric<3, Frame::Inertial, DataVector>>(
-          solution.variables(
-              cart_coords, t,
-              tmpl::list<gr::Tags::InverseSpatialMetric<3, Frame::Inertial,
-                                                        DataVector>>{}));
+      get<gr::Tags::InverseSpatialMetric<3, Frame::Inertial, DataVector> >(
+          solution.variables(cart_coords, t,
+                             tmpl::list<gr::Tags::InverseSpatialMetric<
+                                 3, Frame::Inertial, DataVector> >{}));
 
   const DataVector one_over_one_form_magnitude =
       1.0 / get(magnitude(
-                db::get<StrahlkorperTags::NormalOneForm<Frame::Inertial>>(box),
+                db::get<StrahlkorperTags::NormalOneForm<Frame::Inertial> >(box),
                 inverse_spatial_metric));
   const auto unit_normal_one_form = StrahlkorperGr::unit_normal_one_form(
-      db::get<StrahlkorperTags::NormalOneForm<Frame::Inertial>>(box),
+      db::get<StrahlkorperTags::NormalOneForm<Frame::Inertial> >(box),
       one_over_one_form_magnitude);
   const auto grad_unit_normal_one_form =
       StrahlkorperGr::grad_unit_normal_one_form(
-          db::get<StrahlkorperTags::Rhat<Frame::Inertial>>(box),
-          db::get<StrahlkorperTags::Radius<Frame::Inertial>>(box),
+          db::get<StrahlkorperTags::Rhat<Frame::Inertial> >(box),
+          db::get<StrahlkorperTags::Radius<Frame::Inertial> >(box),
           unit_normal_one_form,
-          db::get<StrahlkorperTags::D2xRadius<Frame::Inertial>>(box),
+          db::get<StrahlkorperTags::D2xRadius<Frame::Inertial> >(box),
           one_over_one_form_magnitude,
           raise_or_lower_first_index(
               gr::christoffel_first_kind(deriv_spatial_metric),
@@ -163,48 +163,48 @@ void test_minkowski() {
 
   CHECK_ITERABLE_APPROX(extrinsic_curvature, extrinsic_curvature_minkowski);
 }
-}  // namespace TestExtrinsicCurvature
+} // namespace TestExtrinsicCurvature
 
 template <typename Solution, typename SpatialRicciScalar,
           typename ExpectedLambda>
-void test_ricci_scalar(const Solution& solution,
-                       const SpatialRicciScalar& spatial_ricci_scalar,
-                       const ExpectedLambda& expected) noexcept {
+void test_ricci_scalar(const Solution &solution,
+                       const SpatialRicciScalar &spatial_ricci_scalar,
+                       const ExpectedLambda &expected) noexcept {
   // Make surface of radius 2.
   const auto box = db::create<
-      db::AddSimpleTags<StrahlkorperTags::items_tags<Frame::Inertial>>,
+      db::AddSimpleTags<StrahlkorperTags::items_tags<Frame::Inertial> >,
       db::AddComputeTags<
-          StrahlkorperTags::compute_items_tags<Frame::Inertial>>>(
-      Strahlkorper<Frame::Inertial>(8, 8, 2.0, {{0.0, 0.0, 0.0}}));
+          StrahlkorperTags::compute_items_tags<Frame::Inertial> > >(
+      Strahlkorper<Frame::Inertial>(8, 8, 2.0, { { 0.0, 0.0, 0.0 } }));
 
   const double t = 0.0;
-  const auto& cart_coords =
-      db::get<StrahlkorperTags::CartesianCoords<Frame::Inertial>>(box);
+  const auto &cart_coords =
+      db::get<StrahlkorperTags::CartesianCoords<Frame::Inertial> >(box);
 
   const auto vars = solution.variables(
       cart_coords, t, typename Solution::template tags<DataVector>{});
 
-  const auto& spatial_metric =
-      get<gr::Tags::SpatialMetric<3, Frame::Inertial, DataVector>>(vars);
-  const auto& deriv_spatial_metric =
+  const auto &spatial_metric =
+      get<gr::Tags::SpatialMetric<3, Frame::Inertial, DataVector> >(vars);
+  const auto &deriv_spatial_metric =
       get<Tags::deriv<gr::Tags::SpatialMetric<3, Frame::Inertial, DataVector>,
-                      tmpl::size_t<3>, Frame::Inertial>>(vars);
+                      tmpl::size_t<3>, Frame::Inertial> >(vars);
   const auto inverse_spatial_metric =
       determinant_and_inverse(spatial_metric).second;
 
   const DataVector one_over_one_form_magnitude =
       1.0 / get(magnitude(
-                db::get<StrahlkorperTags::NormalOneForm<Frame::Inertial>>(box),
+                db::get<StrahlkorperTags::NormalOneForm<Frame::Inertial> >(box),
                 inverse_spatial_metric));
   const auto unit_normal_one_form = StrahlkorperGr::unit_normal_one_form(
-      db::get<StrahlkorperTags::NormalOneForm<Frame::Inertial>>(box),
+      db::get<StrahlkorperTags::NormalOneForm<Frame::Inertial> >(box),
       one_over_one_form_magnitude);
   const auto grad_unit_normal_one_form =
       StrahlkorperGr::grad_unit_normal_one_form(
-          db::get<StrahlkorperTags::Rhat<Frame::Inertial>>(box),
-          db::get<StrahlkorperTags::Radius<Frame::Inertial>>(box),
+          db::get<StrahlkorperTags::Rhat<Frame::Inertial> >(box),
+          db::get<StrahlkorperTags::Radius<Frame::Inertial> >(box),
           unit_normal_one_form,
-          db::get<StrahlkorperTags::D2xRadius<Frame::Inertial>>(box),
+          db::get<StrahlkorperTags::D2xRadius<Frame::Inertial> >(box),
           one_over_one_form_magnitude,
           raise_or_lower_first_index(
               gr::christoffel_first_kind(deriv_spatial_metric),
@@ -222,30 +222,31 @@ void test_ricci_scalar(const Solution& solution,
 }
 
 template <typename Solution, typename ExpectedLambda>
-void test_area_element(const Solution& solution, const double surface_radius,
-                       const ExpectedLambda& expected) noexcept {
+void test_area_element(const Solution &solution, const double surface_radius,
+                       const ExpectedLambda &expected) noexcept {
   const auto box = db::create<
-      db::AddSimpleTags<StrahlkorperTags::items_tags<Frame::Inertial>>,
+      db::AddSimpleTags<StrahlkorperTags::items_tags<Frame::Inertial> >,
       db::AddComputeTags<
-          StrahlkorperTags::compute_items_tags<Frame::Inertial>>>(
-      Strahlkorper<Frame::Inertial>(8, 8, surface_radius, {{0.0, 0.0, 0.0}}));
+          StrahlkorperTags::compute_items_tags<Frame::Inertial> > >(
+      Strahlkorper<Frame::Inertial>(8, 8, surface_radius,
+                                    { { 0.0, 0.0, 0.0 } }));
 
   const double t = 0.0;
-  const auto& cart_coords =
-      db::get<StrahlkorperTags::CartesianCoords<Frame::Inertial>>(box);
+  const auto &cart_coords =
+      db::get<StrahlkorperTags::CartesianCoords<Frame::Inertial> >(box);
 
   const auto vars = solution.variables(
       cart_coords, t, typename Solution::template tags<DataVector>{});
 
-  const auto& spatial_metric =
-      get<gr::Tags::SpatialMetric<3, Frame::Inertial, DataVector>>(vars);
+  const auto &spatial_metric =
+      get<gr::Tags::SpatialMetric<3, Frame::Inertial, DataVector> >(vars);
 
-  const auto& normal_one_form =
-      db::get<StrahlkorperTags::NormalOneForm<Frame::Inertial>>(box);
-  const auto& r_hat = db::get<StrahlkorperTags::Rhat<Frame::Inertial>>(box);
-  const auto& radius = db::get<StrahlkorperTags::Radius<Frame::Inertial>>(box);
-  const auto& jacobian =
-      db::get<StrahlkorperTags::Jacobian<Frame::Inertial>>(box);
+  const auto &normal_one_form =
+      db::get<StrahlkorperTags::NormalOneForm<Frame::Inertial> >(box);
+  const auto &r_hat = db::get<StrahlkorperTags::Rhat<Frame::Inertial> >(box);
+  const auto &radius = db::get<StrahlkorperTags::Radius<Frame::Inertial> >(box);
+  const auto &jacobian =
+      db::get<StrahlkorperTags::Jacobian<Frame::Inertial> >(box);
 
   const auto area_element = StrahlkorperGr::area_element(
       spatial_metric, jacobian, normal_one_form, radius, r_hat);
@@ -254,18 +255,19 @@ void test_area_element(const Solution& solution, const double surface_radius,
 }
 
 void test_euclidean_surface_integral_of_vector(
-    const Strahlkorper<Frame::Inertial>& strahlkorper) noexcept {
+    const Strahlkorper<Frame::Inertial> &strahlkorper) noexcept {
   const auto box = db::create<
-      db::AddSimpleTags<StrahlkorperTags::items_tags<Frame::Inertial>>,
+      db::AddSimpleTags<StrahlkorperTags::items_tags<Frame::Inertial> >,
       db::AddComputeTags<
-          StrahlkorperTags::compute_items_tags<Frame::Inertial>>>(strahlkorper);
+          StrahlkorperTags::compute_items_tags<Frame::Inertial> > >(
+      strahlkorper);
 
-  const auto& normal_one_form =
-      db::get<StrahlkorperTags::NormalOneForm<Frame::Inertial>>(box);
-  const auto& r_hat = db::get<StrahlkorperTags::Rhat<Frame::Inertial>>(box);
-  const auto& radius = db::get<StrahlkorperTags::Radius<Frame::Inertial>>(box);
-  const auto& jacobian =
-      db::get<StrahlkorperTags::Jacobian<Frame::Inertial>>(box);
+  const auto &normal_one_form =
+      db::get<StrahlkorperTags::NormalOneForm<Frame::Inertial> >(box);
+  const auto &r_hat = db::get<StrahlkorperTags::Rhat<Frame::Inertial> >(box);
+  const auto &radius = db::get<StrahlkorperTags::Radius<Frame::Inertial> >(box);
+  const auto &jacobian =
+      db::get<StrahlkorperTags::Jacobian<Frame::Inertial> >(box);
 
   const auto euclidean_area_element = StrahlkorperGr::euclidean_area_element(
       jacobian, normal_one_form, radius, r_hat);
@@ -273,7 +275,7 @@ void test_euclidean_surface_integral_of_vector(
   // Create arbitrary vector
   MAKE_GENERATOR(generator);
   std::uniform_real_distribution<> dist(-1., 1.);
-  const auto test_vector = make_with_random_values<tnsr::I<DataVector, 3>>(
+  const auto test_vector = make_with_random_values<tnsr::I<DataVector, 3> >(
       make_not_null(&generator), make_not_null(&dist), radius);
 
   // Test against integrating this scalar.
@@ -292,7 +294,7 @@ void test_euclidean_surface_integral_of_vector(
 
 template <typename Solution, typename Frame>
 void test_euclidean_surface_integral_of_vector_2(
-    const Solution& solution, const Strahlkorper<Frame>& strahlkorper,
+    const Solution &solution, const Strahlkorper<Frame> &strahlkorper,
     double expected_area) noexcept {
   // Another test:  Integrate (assuming Euclidean metric) the vector
   // V^i = s_j \delta^{ij} (s_k s_l \delta^{kl})^{-1/2} A A_euclid^{-1}
@@ -303,25 +305,25 @@ void test_euclidean_surface_integral_of_vector_2(
   // 16 pi M_irr^2 = 8 pi M^2 (1 + sqrt(1-chi^2))
 
   const auto box = db::create<
-      db::AddSimpleTags<StrahlkorperTags::items_tags<Frame>>,
-      db::AddComputeTags<StrahlkorperTags::compute_items_tags<Frame>>>(
+      db::AddSimpleTags<StrahlkorperTags::items_tags<Frame> >,
+      db::AddComputeTags<StrahlkorperTags::compute_items_tags<Frame> > >(
       strahlkorper);
 
   // Get spatial metric
   const double t = 0.0;
-  const auto& cart_coords =
-      db::get<StrahlkorperTags::CartesianCoords<Frame>>(box);
+  const auto &cart_coords =
+      db::get<StrahlkorperTags::CartesianCoords<Frame> >(box);
   const auto vars = solution.variables(
       cart_coords, t, typename Solution::template tags<DataVector>{});
-  const auto& spatial_metric =
-      get<gr::Tags::SpatialMetric<3, Frame, DataVector>>(vars);
+  const auto &spatial_metric =
+      get<gr::Tags::SpatialMetric<3, Frame, DataVector> >(vars);
 
   // Get everything we need for the integral
-  const auto& normal_one_form =
-      db::get<StrahlkorperTags::NormalOneForm<Frame>>(box);
-  const auto& r_hat = db::get<StrahlkorperTags::Rhat<Frame>>(box);
-  const auto& radius = db::get<StrahlkorperTags::Radius<Frame>>(box);
-  const auto& jacobian = db::get<StrahlkorperTags::Jacobian<Frame>>(box);
+  const auto &normal_one_form =
+      db::get<StrahlkorperTags::NormalOneForm<Frame> >(box);
+  const auto &r_hat = db::get<StrahlkorperTags::Rhat<Frame> >(box);
+  const auto &radius = db::get<StrahlkorperTags::Radius<Frame> >(box);
+  const auto &jacobian = db::get<StrahlkorperTags::Jacobian<Frame> >(box);
   const auto euclidean_area_element = StrahlkorperGr::euclidean_area_element(
       jacobian, normal_one_form, radius, r_hat);
 
@@ -333,7 +335,8 @@ void test_euclidean_surface_integral_of_vector_2(
   const auto test_vector_factor = Scalar<DataVector>(
       get(area_element) / get(euclidean_area_element) /
       sqrt(get(dot_product(normal_one_form, normal_one_form))));
-  auto test_vector = make_with_value<tnsr::I<DataVector, 3, Frame>>(r_hat, 0.0);
+  auto test_vector =
+      make_with_value<tnsr::I<DataVector, 3, Frame> >(r_hat, 0.0);
   for (size_t i = 0; i < 3; ++i) {
     test_vector.get(i) = normal_one_form.get(i) * get(test_vector_factor);
   }
@@ -348,28 +351,29 @@ void test_euclidean_surface_integral_of_vector_2(
 }
 
 void test_euclidean_area_element(
-    const Strahlkorper<Frame::Inertial>& strahlkorper) noexcept {
+    const Strahlkorper<Frame::Inertial> &strahlkorper) noexcept {
   const auto box = db::create<
-      db::AddSimpleTags<StrahlkorperTags::items_tags<Frame::Inertial>>,
+      db::AddSimpleTags<StrahlkorperTags::items_tags<Frame::Inertial> >,
       db::AddComputeTags<
-          StrahlkorperTags::compute_items_tags<Frame::Inertial>>>(strahlkorper);
+          StrahlkorperTags::compute_items_tags<Frame::Inertial> > >(
+      strahlkorper);
 
   // Create a Minkowski metric.
   const gr::Solutions::Minkowski<3> solution{};
   const double t = 0.0;
-  const auto& cart_coords =
-      db::get<StrahlkorperTags::CartesianCoords<Frame::Inertial>>(box);
+  const auto &cart_coords =
+      db::get<StrahlkorperTags::CartesianCoords<Frame::Inertial> >(box);
   const auto vars = solution.variables(
       cart_coords, t, gr::Solutions::Minkowski<3>::tags<DataVector>{});
-  const auto& spatial_metric =
-      get<gr::Tags::SpatialMetric<3, Frame::Inertial, DataVector>>(vars);
+  const auto &spatial_metric =
+      get<gr::Tags::SpatialMetric<3, Frame::Inertial, DataVector> >(vars);
 
-  const auto& normal_one_form =
-      db::get<StrahlkorperTags::NormalOneForm<Frame::Inertial>>(box);
-  const auto& r_hat = db::get<StrahlkorperTags::Rhat<Frame::Inertial>>(box);
-  const auto& radius = db::get<StrahlkorperTags::Radius<Frame::Inertial>>(box);
-  const auto& jacobian =
-      db::get<StrahlkorperTags::Jacobian<Frame::Inertial>>(box);
+  const auto &normal_one_form =
+      db::get<StrahlkorperTags::NormalOneForm<Frame::Inertial> >(box);
+  const auto &r_hat = db::get<StrahlkorperTags::Rhat<Frame::Inertial> >(box);
+  const auto &radius = db::get<StrahlkorperTags::Radius<Frame::Inertial> >(box);
+  const auto &jacobian =
+      db::get<StrahlkorperTags::Jacobian<Frame::Inertial> >(box);
 
   // We are using a flat metric, so area_element and euclidean_area_element
   // should be the same, and this is what we test.
@@ -382,31 +386,32 @@ void test_euclidean_area_element(
 }
 
 template <typename Solution, typename Fr>
-void test_area(const Solution& solution, const Strahlkorper<Fr>& strahlkorper,
+void test_area(const Solution &solution, const Strahlkorper<Fr> &strahlkorper,
                const double expected, const double expected_irreducible_mass,
                const double dimensionful_spin_magnitude,
                const double expected_christodoulou_mass) noexcept {
   const auto box = db::create<
-      db::AddSimpleTags<StrahlkorperTags::items_tags<Frame::Inertial>>,
+      db::AddSimpleTags<StrahlkorperTags::items_tags<Frame::Inertial> >,
       db::AddComputeTags<
-          StrahlkorperTags::compute_items_tags<Frame::Inertial>>>(strahlkorper);
+          StrahlkorperTags::compute_items_tags<Frame::Inertial> > >(
+      strahlkorper);
 
   const double t = 0.0;
-  const auto& cart_coords =
-      db::get<StrahlkorperTags::CartesianCoords<Frame::Inertial>>(box);
+  const auto &cart_coords =
+      db::get<StrahlkorperTags::CartesianCoords<Frame::Inertial> >(box);
 
   const auto vars = solution.variables(
       cart_coords, t, typename Solution::template tags<DataVector>{});
 
-  const auto& spatial_metric =
-      get<gr::Tags::SpatialMetric<3, Frame::Inertial, DataVector>>(vars);
+  const auto &spatial_metric =
+      get<gr::Tags::SpatialMetric<3, Frame::Inertial, DataVector> >(vars);
 
-  const auto& normal_one_form =
-      db::get<StrahlkorperTags::NormalOneForm<Frame::Inertial>>(box);
-  const auto& r_hat = db::get<StrahlkorperTags::Rhat<Frame::Inertial>>(box);
-  const auto& radius = db::get<StrahlkorperTags::Radius<Frame::Inertial>>(box);
-  const auto& jacobian =
-      db::get<StrahlkorperTags::Jacobian<Frame::Inertial>>(box);
+  const auto &normal_one_form =
+      db::get<StrahlkorperTags::NormalOneForm<Frame::Inertial> >(box);
+  const auto &r_hat = db::get<StrahlkorperTags::Rhat<Frame::Inertial> >(box);
+  const auto &radius = db::get<StrahlkorperTags::Radius<Frame::Inertial> >(box);
+  const auto &jacobian =
+      db::get<StrahlkorperTags::Jacobian<Frame::Inertial> >(box);
 
   const auto area_element = StrahlkorperGr::area_element(
       spatial_metric, jacobian, normal_one_form, radius, r_hat);
@@ -439,34 +444,34 @@ void test_area(const Solution& solution, const Strahlkorper<Fr>& strahlkorper,
 //
 // This tests that I_1==I_2 for an arbitrary 3-vector J^i.
 template <typename Solution, typename Frame>
-void test_integral_correspondence(
-    const Solution& solution,
-    const Strahlkorper<Frame>& strahlkorper) noexcept {
+void
+test_integral_correspondence(const Solution &solution,
+                             const Strahlkorper<Frame> &strahlkorper) noexcept {
   const auto box = db::create<
-      db::AddSimpleTags<StrahlkorperTags::items_tags<Frame>>,
-      db::AddComputeTags<StrahlkorperTags::compute_items_tags<Frame>>>(
+      db::AddSimpleTags<StrahlkorperTags::items_tags<Frame> >,
+      db::AddComputeTags<StrahlkorperTags::compute_items_tags<Frame> > >(
       strahlkorper);
 
   const double t = 0.0;
-  const auto& cart_coords =
-      db::get<StrahlkorperTags::CartesianCoords<Frame>>(box);
+  const auto &cart_coords =
+      db::get<StrahlkorperTags::CartesianCoords<Frame> >(box);
 
   const auto vars = solution.variables(
       cart_coords, t, typename Solution::template tags<DataVector>{});
 
-  const auto& spatial_metric =
-      get<gr::Tags::SpatialMetric<3, Frame, DataVector>>(vars);
-  const auto& lapse = get<gr::Tags::Lapse<DataVector>>(vars);
+  const auto &spatial_metric =
+      get<gr::Tags::SpatialMetric<3, Frame, DataVector> >(vars);
+  const auto &lapse = get<gr::Tags::Lapse<DataVector> >(vars);
   const auto det_and_inverse_spatial_metric =
       determinant_and_inverse(spatial_metric);
-  const auto& det_spatial_metric = det_and_inverse_spatial_metric.first;
-  const auto& inverse_spatial_metric = det_and_inverse_spatial_metric.second;
+  const auto &det_spatial_metric = det_and_inverse_spatial_metric.first;
+  const auto &inverse_spatial_metric = det_and_inverse_spatial_metric.second;
 
-  const auto& normal_one_form =
-      db::get<StrahlkorperTags::NormalOneForm<Frame>>(box);
-  const auto& r_hat = db::get<StrahlkorperTags::Rhat<Frame>>(box);
-  const auto& radius = db::get<StrahlkorperTags::Radius<Frame>>(box);
-  const auto& jacobian = db::get<StrahlkorperTags::Jacobian<Frame>>(box);
+  const auto &normal_one_form =
+      db::get<StrahlkorperTags::NormalOneForm<Frame> >(box);
+  const auto &r_hat = db::get<StrahlkorperTags::Rhat<Frame> >(box);
+  const auto &radius = db::get<StrahlkorperTags::Radius<Frame> >(box);
+  const auto &jacobian = db::get<StrahlkorperTags::Jacobian<Frame> >(box);
   const auto area_element = StrahlkorperGr::area_element(
       spatial_metric, jacobian, normal_one_form, radius, r_hat);
   const auto euclidean_area_element = StrahlkorperGr::euclidean_area_element(
@@ -488,7 +493,7 @@ void test_integral_correspondence(
   // Set up random values for test_vector
   MAKE_GENERATOR(generator);
   std::uniform_real_distribution<> dist(-1., 1.);
-  const auto test_vector = make_with_random_values<tnsr::I<DataVector, 3>>(
+  const auto test_vector = make_with_random_values<tnsr::I<DataVector, 3> >(
       make_not_null(&generator), make_not_null(&dist), lapse);
 
   const auto scalar_1 = Scalar<DataVector>(
@@ -506,33 +511,34 @@ void test_integral_correspondence(
 }
 
 template <typename Solution, typename Fr>
-void test_surface_integral_of_scalar(const Solution& solution,
-                                     const Strahlkorper<Fr>& strahlkorper,
+void test_surface_integral_of_scalar(const Solution &solution,
+                                     const Strahlkorper<Fr> &strahlkorper,
                                      const double expected) noexcept {
-  const auto box =
-      db::create<db::AddSimpleTags<StrahlkorperTags::items_tags<Fr>>,
-                 db::AddComputeTags<StrahlkorperTags::compute_items_tags<Fr>>>(
-          strahlkorper);
+  const auto box = db::create<
+      db::AddSimpleTags<StrahlkorperTags::items_tags<Fr> >,
+      db::AddComputeTags<StrahlkorperTags::compute_items_tags<Fr> > >(
+      strahlkorper);
 
   const double t = 0.0;
-  const auto& cart_coords = db::get<StrahlkorperTags::CartesianCoords<Fr>>(box);
+  const auto &cart_coords =
+      db::get<StrahlkorperTags::CartesianCoords<Fr> >(box);
 
   const auto vars = solution.variables(
       cart_coords, t, typename Solution::template tags<DataVector>{});
 
-  const auto& spatial_metric =
-      get<gr::Tags::SpatialMetric<3, Fr, DataVector>>(vars);
+  const auto &spatial_metric =
+      get<gr::Tags::SpatialMetric<3, Fr, DataVector> >(vars);
 
-  const auto& normal_one_form =
-      db::get<StrahlkorperTags::NormalOneForm<Fr>>(box);
-  const auto& r_hat = db::get<StrahlkorperTags::Rhat<Fr>>(box);
-  const auto& radius = db::get<StrahlkorperTags::Radius<Fr>>(box);
-  const auto& jacobian = db::get<StrahlkorperTags::Jacobian<Fr>>(box);
+  const auto &normal_one_form =
+      db::get<StrahlkorperTags::NormalOneForm<Fr> >(box);
+  const auto &r_hat = db::get<StrahlkorperTags::Rhat<Fr> >(box);
+  const auto &radius = db::get<StrahlkorperTags::Radius<Fr> >(box);
+  const auto &jacobian = db::get<StrahlkorperTags::Jacobian<Fr> >(box);
 
   const auto area_element = StrahlkorperGr::area_element(
       spatial_metric, jacobian, normal_one_form, radius, r_hat);
 
-  auto scalar = make_with_value<Scalar<DataVector>>(radius, 0.0);
+  auto scalar = make_with_value<Scalar<DataVector> >(radius, 0.0);
   get(scalar) = square(get<0>(cart_coords));
 
   const double integral = StrahlkorperGr::surface_integral_of_scalar(
@@ -542,65 +548,67 @@ void test_surface_integral_of_scalar(const Solution& solution,
 }
 
 template <typename Solution, typename Fr>
-void test_spin_function(const Solution& solution,
-                        const Strahlkorper<Fr>& strahlkorper,
+void test_spin_function(const Solution &solution,
+                        const Strahlkorper<Fr> &strahlkorper,
                         const double expected) noexcept {
   const auto box = db::create<
-      db::AddSimpleTags<StrahlkorperTags::items_tags<Frame::Inertial>>,
+      db::AddSimpleTags<StrahlkorperTags::items_tags<Frame::Inertial> >,
       db::AddComputeTags<
-          StrahlkorperTags::compute_items_tags<Frame::Inertial>>>(strahlkorper);
+          StrahlkorperTags::compute_items_tags<Frame::Inertial> > >(
+      strahlkorper);
 
   const double t = 0.0;
-  const auto& cart_coords =
-      db::get<StrahlkorperTags::CartesianCoords<Frame::Inertial>>(box);
+  const auto &cart_coords =
+      db::get<StrahlkorperTags::CartesianCoords<Frame::Inertial> >(box);
 
   const auto vars = solution.variables(
       cart_coords, t, typename Solution::template tags<DataVector>{});
 
-  const auto& spatial_metric =
-      get<gr::Tags::SpatialMetric<3, Frame::Inertial, DataVector>>(vars);
+  const auto &spatial_metric =
+      get<gr::Tags::SpatialMetric<3, Frame::Inertial, DataVector> >(vars);
   const auto inverse_spatial_metric =
       determinant_and_inverse(spatial_metric).second;
 
-  const auto& normal_one_form =
-      db::get<StrahlkorperTags::NormalOneForm<Frame::Inertial>>(box);
+  const auto &normal_one_form =
+      db::get<StrahlkorperTags::NormalOneForm<Frame::Inertial> >(box);
   const DataVector one_over_one_form_magnitude =
       1.0 / get(magnitude(
-                db::get<StrahlkorperTags::NormalOneForm<Frame::Inertial>>(box),
+                db::get<StrahlkorperTags::NormalOneForm<Frame::Inertial> >(box),
                 inverse_spatial_metric));
   const auto unit_normal_one_form = StrahlkorperGr::unit_normal_one_form(
-      db::get<StrahlkorperTags::NormalOneForm<Frame::Inertial>>(box),
+      db::get<StrahlkorperTags::NormalOneForm<Frame::Inertial> >(box),
       one_over_one_form_magnitude);
   const auto unit_normal_vector =
       raise_or_lower_index(unit_normal_one_form, inverse_spatial_metric);
 
-  const auto& r_hat = db::get<StrahlkorperTags::Rhat<Frame::Inertial>>(box);
-  const auto& radius = db::get<StrahlkorperTags::Radius<Frame::Inertial>>(box);
-  const auto& jacobian =
-      db::get<StrahlkorperTags::Jacobian<Frame::Inertial>>(box);
+  const auto &r_hat = db::get<StrahlkorperTags::Rhat<Frame::Inertial> >(box);
+  const auto &radius = db::get<StrahlkorperTags::Radius<Frame::Inertial> >(box);
+  const auto &jacobian =
+      db::get<StrahlkorperTags::Jacobian<Frame::Inertial> >(box);
   const auto area_element = StrahlkorperGr::area_element(
       spatial_metric, jacobian, normal_one_form, radius, r_hat);
 
-  const auto& ylm = strahlkorper.ylm_spherepack();
+  const auto &ylm = strahlkorper.ylm_spherepack();
 
-  const auto& deriv_spatial_metric =
+  const auto &deriv_spatial_metric =
       get<Tags::deriv<gr::Tags::SpatialMetric<3, Frame::Inertial, DataVector>,
-                      tmpl::size_t<3>, Frame::Inertial>>(vars);
+                      tmpl::size_t<3>, Frame::Inertial> >(vars);
   const auto extrinsic_curvature = gr::extrinsic_curvature(
-      get<gr::Tags::Lapse<DataVector>>(vars),
-      get<gr::Tags::Shift<3, Frame::Inertial, DataVector>>(vars),
+      get<gr::Tags::Lapse<DataVector> >(vars),
+      get<gr::Tags::Shift<3, Frame::Inertial, DataVector> >(vars),
       get<Tags::deriv<gr::Tags::Shift<3, Frame::Inertial, DataVector>,
-                      tmpl::size_t<3>, Frame::Inertial>>(vars),
+                      tmpl::size_t<3>, Frame::Inertial> >(vars),
       spatial_metric,
-      get<Tags::dt<gr::Tags::SpatialMetric<3, Frame::Inertial, DataVector>>>(
+      get<Tags::dt<gr::Tags::SpatialMetric<3, Frame::Inertial, DataVector> > >(
           vars),
       deriv_spatial_metric);
 
-  const auto& tangents =
-      db::get<StrahlkorperTags::Tangents<Frame::Inertial>>(box);
+  const auto &tangents =
+      db::get<StrahlkorperTags::Tangents<Frame::Inertial> >(box);
 
-  const auto spin_function = StrahlkorperGr::spin_function(
-      tangents, ylm, unit_normal_vector, area_element, extrinsic_curvature);
+  const auto spin_function =
+      StrahlkorperGr::spin_function(tangents, strahlkorper, unit_normal_vector,
+                                    area_element, extrinsic_curvature);
 
   auto integrand = spin_function;
   get(integrand) *= get(area_element) * get(spin_function);
@@ -613,74 +621,76 @@ void test_spin_function(const Solution& solution,
 
 template <typename Solution, typename Fr>
 void test_dimensionful_spin_magnitude(
-    const Solution& solution, const Strahlkorper<Fr>& strahlkorper,
+    const Solution &solution, const Strahlkorper<Fr> &strahlkorper,
     const double mass, const std::array<double, 3> dimensionless_spin,
-    const Scalar<DataVector>& horizon_radius_with_spin_on_z_axis,
-    const YlmSpherepack& ylm_with_spin_on_z_axis, const double expected,
+    const Scalar<DataVector> &horizon_radius_with_spin_on_z_axis,
+    const YlmSpherepack &ylm_with_spin_on_z_axis, const double expected,
     const double tolerance) noexcept {
   const auto box = db::create<
-      db::AddSimpleTags<StrahlkorperTags::items_tags<Frame::Inertial>>,
+      db::AddSimpleTags<StrahlkorperTags::items_tags<Frame::Inertial> >,
       db::AddComputeTags<
-          StrahlkorperTags::compute_items_tags<Frame::Inertial>>>(strahlkorper);
+          StrahlkorperTags::compute_items_tags<Frame::Inertial> > >(
+      strahlkorper);
 
   const double t = 0.0;
-  const auto& cart_coords =
-      db::get<StrahlkorperTags::CartesianCoords<Frame::Inertial>>(box);
+  const auto &cart_coords =
+      db::get<StrahlkorperTags::CartesianCoords<Frame::Inertial> >(box);
 
   const auto vars = solution.variables(
       cart_coords, t, typename Solution::template tags<DataVector>{});
 
-  const auto& spatial_metric =
-      get<gr::Tags::SpatialMetric<3, Frame::Inertial, DataVector>>(vars);
+  const auto &spatial_metric =
+      get<gr::Tags::SpatialMetric<3, Frame::Inertial, DataVector> >(vars);
   const auto inverse_spatial_metric =
       determinant_and_inverse(spatial_metric).second;
 
-  const auto& normal_one_form =
-      db::get<StrahlkorperTags::NormalOneForm<Frame::Inertial>>(box);
+  const auto &normal_one_form =
+      db::get<StrahlkorperTags::NormalOneForm<Frame::Inertial> >(box);
   const DataVector one_over_one_form_magnitude =
       1.0 / get(magnitude(
-                db::get<StrahlkorperTags::NormalOneForm<Frame::Inertial>>(box),
+                db::get<StrahlkorperTags::NormalOneForm<Frame::Inertial> >(box),
                 inverse_spatial_metric));
   const auto unit_normal_one_form = StrahlkorperGr::unit_normal_one_form(
-      db::get<StrahlkorperTags::NormalOneForm<Frame::Inertial>>(box),
+      db::get<StrahlkorperTags::NormalOneForm<Frame::Inertial> >(box),
       one_over_one_form_magnitude);
   const auto unit_normal_vector =
       raise_or_lower_index(unit_normal_one_form, inverse_spatial_metric);
 
-  const auto& r_hat = db::get<StrahlkorperTags::Rhat<Frame::Inertial>>(box);
-  const auto& radius = db::get<StrahlkorperTags::Radius<Frame::Inertial>>(box);
-  const auto& jacobian =
-      db::get<StrahlkorperTags::Jacobian<Frame::Inertial>>(box);
+  const auto &r_hat = db::get<StrahlkorperTags::Rhat<Frame::Inertial> >(box);
+  const auto &radius = db::get<StrahlkorperTags::Radius<Frame::Inertial> >(box);
+  const auto &jacobian =
+      db::get<StrahlkorperTags::Jacobian<Frame::Inertial> >(box);
   const auto area_element = StrahlkorperGr::area_element(
       spatial_metric, jacobian, normal_one_form, radius, r_hat);
 
-  const auto& ylm = strahlkorper.ylm_spherepack();
+  const auto &ylm = strahlkorper.ylm_spherepack();
 
-  const auto& deriv_spatial_metric =
+  const auto &deriv_spatial_metric =
       get<Tags::deriv<gr::Tags::SpatialMetric<3, Frame::Inertial, DataVector>,
-                      tmpl::size_t<3>, Frame::Inertial>>(vars);
+                      tmpl::size_t<3>, Frame::Inertial> >(vars);
   const auto extrinsic_curvature = gr::extrinsic_curvature(
-      get<gr::Tags::Lapse<DataVector>>(vars),
-      get<gr::Tags::Shift<3, Frame::Inertial, DataVector>>(vars),
+      get<gr::Tags::Lapse<DataVector> >(vars),
+      get<gr::Tags::Shift<3, Frame::Inertial, DataVector> >(vars),
       get<Tags::deriv<gr::Tags::Shift<3, Frame::Inertial, DataVector>,
-                      tmpl::size_t<3>, Frame::Inertial>>(vars),
+                      tmpl::size_t<3>, Frame::Inertial> >(vars),
       spatial_metric,
-      get<Tags::dt<gr::Tags::SpatialMetric<3, Frame::Inertial, DataVector>>>(
+      get<Tags::dt<gr::Tags::SpatialMetric<3, Frame::Inertial, DataVector> > >(
           vars),
       deriv_spatial_metric);
 
-  const auto& tangents =
-      db::get<StrahlkorperTags::Tangents<Frame::Inertial>>(box);
+  const auto &tangents =
+      db::get<StrahlkorperTags::Tangents<Frame::Inertial> >(box);
 
-  const auto spin_function = StrahlkorperGr::spin_function(
-      tangents, ylm, unit_normal_vector, area_element, extrinsic_curvature);
+  const auto spin_function =
+      StrahlkorperGr::spin_function(tangents, strahlkorper, unit_normal_vector,
+                                    area_element, extrinsic_curvature);
 
   const auto grad_unit_normal_one_form =
       StrahlkorperGr::grad_unit_normal_one_form(
-          db::get<StrahlkorperTags::Rhat<Frame::Inertial>>(box),
-          db::get<StrahlkorperTags::Radius<Frame::Inertial>>(box),
+          db::get<StrahlkorperTags::Rhat<Frame::Inertial> >(box),
+          db::get<StrahlkorperTags::Radius<Frame::Inertial> >(box),
           unit_normal_one_form,
-          db::get<StrahlkorperTags::D2xRadius<Frame::Inertial>>(box),
+          db::get<StrahlkorperTags::D2xRadius<Frame::Inertial> >(box),
           one_over_one_form_magnitude,
           raise_or_lower_first_index(
               gr::christoffel_first_kind(deriv_spatial_metric),
@@ -698,67 +708,70 @@ void test_dimensionful_spin_magnitude(
 }
 
 template <typename Solution, typename Fr>
-void test_spin_vector(
-    const Solution& solution, const Strahlkorper<Fr>& strahlkorper,
-    const double mass, const std::array<double, 3> dimensionless_spin,
-    const Scalar<DataVector>& horizon_radius_with_spin_on_z_axis,
-    const YlmSpherepack& ylm_with_spin_on_z_axis) noexcept {
+void
+test_spin_vector(const Solution &solution, const Strahlkorper<Fr> &strahlkorper,
+                 const double mass,
+                 const std::array<double, 3> dimensionless_spin,
+                 const Scalar<DataVector> &horizon_radius_with_spin_on_z_axis,
+                 const YlmSpherepack &ylm_with_spin_on_z_axis) noexcept {
   const auto box = db::create<
-      db::AddSimpleTags<StrahlkorperTags::items_tags<Frame::Inertial>>,
+      db::AddSimpleTags<StrahlkorperTags::items_tags<Frame::Inertial> >,
       db::AddComputeTags<
-          StrahlkorperTags::compute_items_tags<Frame::Inertial>>>(strahlkorper);
+          StrahlkorperTags::compute_items_tags<Frame::Inertial> > >(
+      strahlkorper);
 
   const double t = 0.0;
-  const auto& cart_coords =
-      db::get<StrahlkorperTags::CartesianCoords<Frame::Inertial>>(box);
+  const auto &cart_coords =
+      db::get<StrahlkorperTags::CartesianCoords<Frame::Inertial> >(box);
 
   const auto vars = solution.variables(
       cart_coords, t, typename Solution::template tags<DataVector>{});
 
-  const auto& spatial_metric =
-      get<gr::Tags::SpatialMetric<3, Frame::Inertial, DataVector>>(vars);
+  const auto &spatial_metric =
+      get<gr::Tags::SpatialMetric<3, Frame::Inertial, DataVector> >(vars);
   const auto inverse_spatial_metric =
       determinant_and_inverse(spatial_metric).second;
 
-  const auto& normal_one_form =
-      db::get<StrahlkorperTags::NormalOneForm<Frame::Inertial>>(box);
+  const auto &normal_one_form =
+      db::get<StrahlkorperTags::NormalOneForm<Frame::Inertial> >(box);
   const DataVector one_over_one_form_magnitude =
       1.0 / get(magnitude(
-                db::get<StrahlkorperTags::NormalOneForm<Frame::Inertial>>(box),
+                db::get<StrahlkorperTags::NormalOneForm<Frame::Inertial> >(box),
                 inverse_spatial_metric));
   const auto unit_normal_one_form = StrahlkorperGr::unit_normal_one_form(
-      db::get<StrahlkorperTags::NormalOneForm<Frame::Inertial>>(box),
+      db::get<StrahlkorperTags::NormalOneForm<Frame::Inertial> >(box),
       one_over_one_form_magnitude);
   const auto unit_normal_vector =
       raise_or_lower_index(unit_normal_one_form, inverse_spatial_metric);
 
-  const auto& r_hat = db::get<StrahlkorperTags::Rhat<Frame::Inertial>>(box);
-  const auto& radius = db::get<StrahlkorperTags::Radius<Frame::Inertial>>(box);
-  const auto& jacobian =
-      db::get<StrahlkorperTags::Jacobian<Frame::Inertial>>(box);
+  const auto &r_hat = db::get<StrahlkorperTags::Rhat<Frame::Inertial> >(box);
+  const auto &radius = db::get<StrahlkorperTags::Radius<Frame::Inertial> >(box);
+  const auto &jacobian =
+      db::get<StrahlkorperTags::Jacobian<Frame::Inertial> >(box);
   const auto area_element = StrahlkorperGr::area_element(
       spatial_metric, jacobian, normal_one_form, radius, r_hat);
 
-  const auto& ylm = strahlkorper.ylm_spherepack();
+  const auto &ylm = strahlkorper.ylm_spherepack();
 
-  const auto& deriv_spatial_metric =
+  const auto &deriv_spatial_metric =
       get<Tags::deriv<gr::Tags::SpatialMetric<3, Frame::Inertial, DataVector>,
-                      tmpl::size_t<3>, Frame::Inertial>>(vars);
+                      tmpl::size_t<3>, Frame::Inertial> >(vars);
   const auto extrinsic_curvature = gr::extrinsic_curvature(
-      get<gr::Tags::Lapse<DataVector>>(vars),
-      get<gr::Tags::Shift<3, Frame::Inertial, DataVector>>(vars),
+      get<gr::Tags::Lapse<DataVector> >(vars),
+      get<gr::Tags::Shift<3, Frame::Inertial, DataVector> >(vars),
       get<Tags::deriv<gr::Tags::Shift<3, Frame::Inertial, DataVector>,
-                      tmpl::size_t<3>, Frame::Inertial>>(vars),
+                      tmpl::size_t<3>, Frame::Inertial> >(vars),
       spatial_metric,
-      get<Tags::dt<gr::Tags::SpatialMetric<3, Frame::Inertial, DataVector>>>(
+      get<Tags::dt<gr::Tags::SpatialMetric<3, Frame::Inertial, DataVector> > >(
           vars),
       deriv_spatial_metric);
 
-  const auto& tangents =
-      db::get<StrahlkorperTags::Tangents<Frame::Inertial>>(box);
+  const auto &tangents =
+      db::get<StrahlkorperTags::Tangents<Frame::Inertial> >(box);
 
-  const auto spin_function = StrahlkorperGr::spin_function(
-      tangents, ylm, unit_normal_vector, area_element, extrinsic_curvature);
+  const auto spin_function =
+      StrahlkorperGr::spin_function(tangents, strahlkorper, unit_normal_vector,
+                                    area_element, extrinsic_curvature);
 
   const auto ricci_scalar = TestHelpers::Kerr::horizon_ricci_scalar(
       horizon_radius_with_spin_on_z_axis, ylm_with_spin_on_z_axis, ylm, mass,
@@ -766,8 +779,8 @@ void test_spin_vector(
 
   const auto spin_vector =
       StrahlkorperGr::spin_vector(magnitude(dimensionless_spin), area_element,
-                                  Scalar<DataVector>{std::move(radius)}, r_hat,
-                                  ricci_scalar, spin_function, ylm);
+                                  Scalar<DataVector>{ std::move(radius) },
+                                  r_hat, ricci_scalar, spin_function, ylm);
 
   CHECK_ITERABLE_APPROX(spin_vector, dimensionless_spin);
 }
@@ -775,10 +788,11 @@ void test_spin_vector(
 SPECTRE_TEST_CASE("Unit.ApparentHorizons.StrahlkorperGr.Expansion",
                   "[ApparentHorizons][Unit]") {
   const auto sphere =
-      Strahlkorper<Frame::Inertial>(8, 8, 2.0, {{0.0, 0.0, 0.0}});
+      Strahlkorper<Frame::Inertial>(8, 8, 2.0, { { 0.0, 0.0, 0.0 } });
 
   test_expansion(
-      gr::Solutions::KerrSchild{1.0, {{0.0, 0.0, 0.0}}, {{0.0, 0.0, 0.0}}},
+      gr::Solutions::KerrSchild{ 1.0, { { 0.0, 0.0, 0.0 } },
+                                 { { 0.0, 0.0, 0.0 } } },
       sphere, [](const size_t size) noexcept { return DataVector(size, 0.0); });
   test_expansion(
       gr::Solutions::Minkowski<3>{}, sphere,
@@ -786,8 +800,8 @@ SPECTRE_TEST_CASE("Unit.ApparentHorizons.StrahlkorperGr.Expansion",
 
   constexpr int l_max = 20;
   const double mass = 4.444;
-  const std::array<double, 3> spin{{0.3, 0.4, 0.5}};
-  const std::array<double, 3> center{{0.0, 0.0, 0.0}};
+  const std::array<double, 3> spin{ { 0.3, 0.4, 0.5 } };
+  const std::array<double, 3> center{ { 0.0, 0.0, 0.0 } };
 
   const auto horizon_radius = gr::Solutions::kerr_horizon_radius(
       Strahlkorper<Frame::Inertial>(l_max, l_max, 2.0, center)
@@ -799,7 +813,7 @@ SPECTRE_TEST_CASE("Unit.ApparentHorizons.StrahlkorperGr.Expansion",
       Strahlkorper<Frame::Inertial>(l_max, l_max, get(horizon_radius), center);
 
   test_expansion(
-      gr::Solutions::KerrSchild{mass, spin, center}, kerr_horizon,
+      gr::Solutions::KerrSchild{ mass, spin, center }, kerr_horizon,
       [](const size_t size) noexcept { return DataVector(size, 0.0); });
 }
 
@@ -815,31 +829,32 @@ SPECTRE_TEST_CASE("Unit.ApparentHorizons.StrahlkorperGr.ExtrinsicCurvature",
 SPECTRE_TEST_CASE("Unit.ApparentHorizons.StrahlkorperGr.RicciScalar",
                   "[ApparentHorizons][Unit]") {
   const double mass = 1.0;
-  test_ricci_scalar(
-      gr::Solutions::KerrSchild(mass, {{0.0, 0.0, 0.0}}, {{0.0, 0.0, 0.0}}),
-      [&mass](const auto& cartesian_coords) noexcept {
-        return TestHelpers::Schwarzschild::spatial_ricci(cartesian_coords,
-                                                         mass);
-      },
-      [&mass](const size_t size) noexcept {
-        return DataVector(size, 0.5 / square(mass));
-      });
+  test_ricci_scalar(gr::Solutions::KerrSchild(mass, { { 0.0, 0.0, 0.0 } },
+                                              { { 0.0, 0.0, 0.0 } }),
+                    [&mass](const auto & cartesian_coords) noexcept {
+                      return TestHelpers::Schwarzschild::spatial_ricci(
+                          cartesian_coords, mass);
+                    },
+                    [&mass](const size_t size) noexcept {
+    return DataVector(size, 0.5 / square(mass));
+  });
   test_ricci_scalar(
       gr::Solutions::Minkowski<3>{},
-      [](const auto& cartesian_coords) noexcept {
-        return make_with_value<tnsr::ii<DataVector, 3, Frame::Inertial>>(
+      [](const auto & cartesian_coords) noexcept {
+        return make_with_value<tnsr::ii<DataVector, 3, Frame::Inertial> >(
             cartesian_coords, 0.0);
       },
       [](const size_t size) noexcept { return DataVector(size, 0.5); });
 }
-}  // namespace
+} // namespace
 
 SPECTRE_TEST_CASE("Unit.ApparentHorizons.StrahlkorperGr.AreaElement",
                   "[ApparentHorizons][Unit]") {
   // Check value of dA for a Schwarzschild horizon and a sphere in flat space
   test_area_element(
-      gr::Solutions::KerrSchild{4.0, {{0.0, 0.0, 0.0}}, {{0.0, 0.0, 0.0}}}, 8.0,
-      [](const size_t size) noexcept { return DataVector(size, 64.0); });
+      gr::Solutions::KerrSchild{ 4.0, { { 0.0, 0.0, 0.0 } },
+                                 { { 0.0, 0.0, 0.0 } } },
+      8.0, [](const size_t size) noexcept { return DataVector(size, 64.0); });
   test_area_element(
       gr::Solutions::Minkowski<3>{}, 2.0,
       [](const size_t size) noexcept { return DataVector(size, 4.0); });
@@ -847,8 +862,8 @@ SPECTRE_TEST_CASE("Unit.ApparentHorizons.StrahlkorperGr.AreaElement",
   // Check the area of a Kerr horizon
   constexpr int l_max = 22;
   const double mass = 4.444;
-  const std::array<double, 3> spin{{0.4, 0.33, 0.22}};
-  const std::array<double, 3> center{{0.0, 0.0, 0.0}};
+  const std::array<double, 3> spin{ { 0.4, 0.33, 0.22 } };
+  const std::array<double, 3> center{ { 0.0, 0.0, 0.0 } };
 
   const double kerr_horizon_radius =
       mass * (1.0 + sqrt(1.0 - square(magnitude(spin))));
@@ -866,14 +881,14 @@ SPECTRE_TEST_CASE("Unit.ApparentHorizons.StrahlkorperGr.AreaElement",
   const auto kerr_horizon =
       Strahlkorper<Frame::Inertial>(l_max, l_max, get(horizon_radius), center);
 
-  test_area(gr::Solutions::KerrSchild{mass, spin, center}, kerr_horizon,
+  test_area(gr::Solutions::KerrSchild{ mass, spin, center }, kerr_horizon,
             expected_area, expected_irreducible_mass,
             square(mass) * magnitude(spin), mass);
 
   test_euclidean_area_element(kerr_horizon);
 
   test_integral_correspondence(gr::Solutions::Minkowski<3>{}, kerr_horizon);
-  test_integral_correspondence(gr::Solutions::KerrSchild{mass, spin, center},
+  test_integral_correspondence(gr::Solutions::KerrSchild{ mass, spin, center },
                                kerr_horizon);
 
   // Check that the two methods of computing the surface integral are
@@ -883,14 +898,14 @@ SPECTRE_TEST_CASE("Unit.ApparentHorizons.StrahlkorperGr.AreaElement",
       l_max, l_max, 0.9 * get(horizon_radius), center);
   const auto outside_kerr_horizon = Strahlkorper<Frame::Inertial>(
       l_max, l_max, 2.0 * get(horizon_radius), center);
-  test_integral_correspondence(gr::Solutions::KerrSchild{mass, spin, center},
+  test_integral_correspondence(gr::Solutions::KerrSchild{ mass, spin, center },
                                inside_kerr_horizon);
-  test_integral_correspondence(gr::Solutions::KerrSchild{mass, spin, center},
+  test_integral_correspondence(gr::Solutions::KerrSchild{ mass, spin, center },
                                outside_kerr_horizon);
 
   test_euclidean_surface_integral_of_vector(kerr_horizon);
   test_euclidean_surface_integral_of_vector_2(
-      gr::Solutions::KerrSchild{mass, spin, center}, kerr_horizon,
+      gr::Solutions::KerrSchild{ mass, spin, center }, kerr_horizon,
       expected_area);
 }
 
@@ -901,8 +916,8 @@ SPECTRE_TEST_CASE(
   // as the scalar
   constexpr int l_max = 20;
   const double mass = 4.444;
-  const std::array<double, 3> spin{{0.0, 0.0, 0.0}};
-  const std::array<double, 3> center{{0.0, 0.0, 0.0}};
+  const std::array<double, 3> spin{ { 0.0, 0.0, 0.0 } };
+  const std::array<double, 3> center{ { 0.0, 0.0, 0.0 } };
 
   const double radius = 2.0 * mass;
 
@@ -913,8 +928,9 @@ SPECTRE_TEST_CASE(
   const auto horizon =
       Strahlkorper<Frame::Inertial>(l_max, l_max, radius, center);
 
-  test_surface_integral_of_scalar(gr::Solutions::KerrSchild{mass, spin, center},
-                                  horizon, expected_integral);
+  test_surface_integral_of_scalar(
+      gr::Solutions::KerrSchild{ mass, spin, center }, horizon,
+      expected_integral);
 }
 
 SPECTRE_TEST_CASE("Unit.ApparentHorizons.StrahlkorperGr.SpinFunction",
@@ -922,8 +938,8 @@ SPECTRE_TEST_CASE("Unit.ApparentHorizons.StrahlkorperGr.SpinFunction",
   // Set up Kerr horizon
   constexpr int l_max = 24;
   const double mass = 4.444;
-  const std::array<double, 3> spin{{0.4, 0.33, 0.22}};
-  const std::array<double, 3> center{{0.0, 0.0, 0.0}};
+  const std::array<double, 3> spin{ { 0.4, 0.33, 0.22 } };
+  const std::array<double, 3> center{ { 0.0, 0.0, 0.0 } };
 
   const auto horizon_radius = gr::Solutions::kerr_horizon_radius(
       Strahlkorper<Frame::Inertial>(l_max, l_max, 2.0, center)
@@ -936,9 +952,9 @@ SPECTRE_TEST_CASE("Unit.ApparentHorizons.StrahlkorperGr.SpinFunction",
 
   // Check value of SpinFunction^2 integrated over the surface for
   // Schwarzschild. Expected result is zero.
-  test_spin_function(gr::Solutions::KerrSchild{mass, {{0.0, 0.0, 0.0}}, center},
-                     Strahlkorper<Frame::Inertial>(l_max, l_max, 8.888, center),
-                     0.0);
+  test_spin_function(
+      gr::Solutions::KerrSchild{ mass, { { 0.0, 0.0, 0.0 } }, center },
+      Strahlkorper<Frame::Inertial>(l_max, l_max, 8.888, center), 0.0);
 
   // Check value of SpinFunction^2 integrated over the surface for
   // Kerr. Derive this by integrating the square of the imaginary
@@ -950,7 +966,7 @@ SPECTRE_TEST_CASE("Unit.ApparentHorizons.StrahlkorperGr.SpinFunction",
   // enter the expected numerical value for this test.
   const double expected_spin_function_sq_integral = 4.0 * 0.0125109627941394;
 
-  test_spin_function(gr::Solutions::KerrSchild{mass, spin, center},
+  test_spin_function(gr::Solutions::KerrSchild{ mass, spin, center },
                      kerr_horizon, expected_spin_function_sq_integral);
 }
 
@@ -958,17 +974,19 @@ SPECTRE_TEST_CASE(
     "Unit.ApparentHorizons.StrahlkorperGr.DimensionfulSpinMagnitude",
     "[ApparentHorizons][Unit]") {
   const double mass = 2.0;
-  const std::array<double, 3> generic_dimensionless_spin = {{0.12, 0.08, 0.04}};
+  const std::array<double, 3> generic_dimensionless_spin = { { 0.12, 0.08,
+                                                               0.04 } };
   const double expected_dimensionless_spin_magnitude =
       magnitude(generic_dimensionless_spin);
   const double expected_spin_magnitude =
       expected_dimensionless_spin_magnitude * square(mass);
-  const std::array<double, 3> center{{0.0, 0.0, 0.0}};
+  const std::array<double, 3> center{ { 0.0, 0.0, 0.0 } };
 
   const double aligned_tolerance = 1.e-13;
   const double aligned_l_max = 12;
   const std::array<double, 3> aligned_dimensionless_spin = {
-      {0.0, 0.0, expected_dimensionless_spin_magnitude}};
+    { 0.0, 0.0, expected_dimensionless_spin_magnitude }
+  };
   const auto aligned_horizon_radius = gr::Solutions::kerr_horizon_radius(
       Strahlkorper<Frame::Inertial>(aligned_l_max, aligned_l_max, 2.0, center)
           .ylm_spherepack()
@@ -977,7 +995,7 @@ SPECTRE_TEST_CASE(
   const auto aligned_kerr_horizon = Strahlkorper<Frame::Inertial>(
       aligned_l_max, aligned_l_max, get(aligned_horizon_radius), center);
   test_dimensionful_spin_magnitude(
-      gr::Solutions::KerrSchild{mass, aligned_dimensionless_spin, center},
+      gr::Solutions::KerrSchild{ mass, aligned_dimensionless_spin, center },
       aligned_kerr_horizon, mass, aligned_dimensionless_spin,
       aligned_horizon_radius, aligned_kerr_horizon.ylm_spherepack(),
       expected_spin_magnitude, aligned_tolerance);
@@ -1006,7 +1024,7 @@ SPECTRE_TEST_CASE(
   const auto rotated_kerr_horizon = Strahlkorper<Frame::Inertial>(
       generic_l_max, generic_l_max, get(rotated_horizon_radius), center);
   test_dimensionful_spin_magnitude(
-      gr::Solutions::KerrSchild{mass, generic_dimensionless_spin, center},
+      gr::Solutions::KerrSchild{ mass, generic_dimensionless_spin, center },
       generic_kerr_horizon, mass, generic_dimensionless_spin,
       rotated_horizon_radius, rotated_kerr_horizon.ylm_spherepack(),
       expected_generic_spin_magnitude, generic_tolerance);
@@ -1017,9 +1035,9 @@ SPECTRE_TEST_CASE("Unit.ApparentHorizons.StrahlkorperGr.SpinVector",
   // Set up Kerr horizon
   constexpr int l_max = 20;
   const double mass = 2.0;
-  const std::array<double, 3> spin{{0.04, 0.08, 0.12}};
+  const std::array<double, 3> spin{ { 0.04, 0.08, 0.12 } };
   const auto spin_magnitude = magnitude(spin);
-  const std::array<double, 3> center{{0.0, 0.0, 0.0}};
+  const std::array<double, 3> center{ { 0.0, 0.0, 0.0 } };
 
   const auto horizon_radius = gr::Solutions::kerr_horizon_radius(
       Strahlkorper<Frame::Inertial>(l_max, l_max, 2.0, center)
@@ -1034,13 +1052,13 @@ SPECTRE_TEST_CASE("Unit.ApparentHorizons.StrahlkorperGr.SpinVector",
           Strahlkorper<Frame::Inertial>(l_max, l_max, 2.0, center)
               .ylm_spherepack()
               .theta_phi_points(),
-          mass, {{0.0, 0.0, spin_magnitude}});
+          mass, { { 0.0, 0.0, spin_magnitude } });
   const auto kerr_horizon_with_spin_on_z_axis = Strahlkorper<Frame::Inertial>(
       l_max, l_max, get(horizon_radius_with_spin_on_z_axis), center);
 
   // Check that the StrahlkorperGr::spin_vector() correctly recovers the
   // chosen dimensionless spin
-  test_spin_vector(gr::Solutions::KerrSchild{mass, spin, center}, kerr_horizon,
-                   mass, spin, horizon_radius_with_spin_on_z_axis,
+  test_spin_vector(gr::Solutions::KerrSchild{ mass, spin, center },
+                   kerr_horizon, mass, spin, horizon_radius_with_spin_on_z_axis,
                    kerr_horizon_with_spin_on_z_axis.ylm_spherepack());
 }
