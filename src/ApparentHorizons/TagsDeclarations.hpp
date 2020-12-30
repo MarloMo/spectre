@@ -70,6 +70,7 @@ struct SpinFunctionCompute;
 struct DimensionfulSpinMagnitude;
 template <typename Frame>
 struct DimensionfulSpinMagnitudeCompute;
+struct ChristodoulouMass;
 
 }  // namespace Tags
 }  // namespace StrahlkorperGr

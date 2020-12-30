@@ -302,6 +302,8 @@ SPECTRE_TEST_CASE("Unit.ApparentHorizons.StrahlkorperDataBox",
       "RicciScalar");
   TestHelpers::db::test_simple_tag<StrahlkorperGr::Tags::SpinFunction>(
       "SpinFunction");
+  TestHelpers::db::test_simple_tag<StrahlkorperGr::Tags::ChristodoulouMass>(
+      "ChristodoulouMass");
   TestHelpers::db::test_simple_tag<
       StrahlkorperGr::Tags::DimensionfulSpinMagnitude>(
       "DimensionfulSpinMagnitude");
@@ -425,4 +427,7 @@ SPECTRE_TEST_CASE("Unit.ApparentHorizons.StrahlkorperDataBox",
   TestHelpers::db::test_compute_tag<
       StrahlkorperGr::Tags::DimensionfulSpinMagnitudeCompute<Frame::Inertial>>(
       "DimensionfulSpinMagnitude");
+  TestHelpers::db::test_compute_tag<
+      StrahlkorperGr::Tags::ChristodoulouMassCompute<Frame::Inertial>>(
+      "ChristodoulouMass");
 }

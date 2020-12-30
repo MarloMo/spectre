@@ -649,5 +649,19 @@ struct DimensionfulSpinMagnitudeCompute : DimensionfulSpinMagnitude,
                  StrahlkorperTags::Strahlkorper<Frame>, AreaElement<Frame>>;
 };
 
+/// The magnitude of the spin angular momentum of a Strahlkorper.
+struct ChristodoulouMass : db::SimpleTag {
+  using type = double;
+};
+
+/// Computes the magnitude of the spin angular momentum of a Strahlkorper.
+template <typename Frame>
+struct ChristodoulouMassCompute : ChristodoulouMass, db::ComputeTag {
+  using base = ChristodoulouMass;
+  using return_type = double;
+  static constexpr auto function = &StrahlkorperGr::christodoulou_mass;
+  using argument_tags = tmpl::list<DimensionfulSpinMagnitude, IrreducibleMass>;
+};
+
 }  // namespace Tags
 }  // namespace StrahlkorperGr
