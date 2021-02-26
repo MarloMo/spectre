@@ -773,23 +773,25 @@ double dimensionful_spin_magnitude(
 }
 
 template <typename Frame>
-std::array<double, 3> spin_vector(const double spin_magnitude,
-                                  const Scalar<DataVector>& area_element,
-                                  const Scalar<DataVector>& radius,
-                                  const tnsr::i<DataVector, 3, Frame>& r_hat,
-                                  const Scalar<DataVector>& ricci_scalar,
-                                  const Scalar<DataVector>& spin_function,
-                                  const YlmSpherepack& ylm) noexcept {
+void spin_vector(const gsl::not_null<std::array<double, 3>*> result,
+                 const double spin_magnitude,
+                 const Scalar<DataVector>& area_element,
+                 const DataVector& radius,
+                 const tnsr::i<DataVector, 3, Frame>& r_hat,
+                 const Scalar<DataVector>& ricci_scalar,
+                 const Scalar<DataVector>& spin_function,
+                 const Strahlkorper<Frame>& strahlkorper) noexcept {
   std::array<double, 3> spin_vector = {{0.0, 0.0, 0.0}};
-  auto integrand = make_with_value<Scalar<DataVector>>(get(radius), 0.0);
+  auto integrand = make_with_value<Scalar<DataVector>>(radius, 0.0);
+  const auto ylm = strahlkorper.ylm_spherepack();
   for (size_t i = 0; i < 3; ++i) {
     // Compute horizon coordinates with a coordinate center such that
     // the mass dipole moment vanishes.
     get(integrand) =
-        get(area_element) * get(ricci_scalar) * r_hat.get(i) * get(radius);
+        get(area_element) * get(ricci_scalar) * r_hat.get(i) * radius;
     get(integrand) =
         ylm.definite_integral(get(integrand).data()) / (-8.0 * M_PI);
-    get(integrand) += r_hat.get(i) * get(radius);
+    get(integrand) += r_hat.get(i) * radius;
 
     // Get a component of a vector in the direction of the spin
     get(integrand) *= get(area_element) * get(spin_function);
@@ -797,7 +799,20 @@ std::array<double, 3> spin_vector(const double spin_magnitude,
   }
 
   // Normalize spin_vector so its magnitude is the magnitude of the spin
-  return spin_vector * (spin_magnitude / magnitude(spin_vector));
+  *result = spin_vector * (spin_magnitude / magnitude(spin_vector));
+}
+
+template <typename Frame>
+std::array<double, 3> spin_vector(
+    const double spin_magnitude, const Scalar<DataVector>& area_element,
+    const DataVector& radius, const tnsr::i<DataVector, 3, Frame>& r_hat,
+    const Scalar<DataVector>& ricci_scalar,
+    const Scalar<DataVector>& spin_function,
+    const Strahlkorper<Frame>& strahlkorper) noexcept {
+  std::array<double, 3> result{};
+  spin_vector(make_not_null(&result), spin_magnitude, area_element, radius,
+              r_hat, ricci_scalar, spin_function, strahlkorper);
+  return result;
 }
 
 double irreducible_mass(const double area) noexcept {
@@ -950,10 +965,19 @@ template double StrahlkorperGr::dimensionful_spin_magnitude<Frame::Inertial>(
     const StrahlkorperTags::aliases::Jacobian<Frame::Inertial>& tangents,
     const YlmSpherepack& ylm, const Scalar<DataVector>& area_element) noexcept;
 
-template std::array<double, 3> StrahlkorperGr::spin_vector<Frame::Inertial>(
+template void StrahlkorperGr::spin_vector<Frame::Inertial>(
+    const gsl::not_null<std::array<double, 3>*> result,
     const double spin_magnitude, const Scalar<DataVector>& area_element,
-    const Scalar<DataVector>& radius,
+    const DataVector& radius,
     const tnsr::i<DataVector, 3, Frame::Inertial>& r_hat,
     const Scalar<DataVector>& ricci_scalar,
-    const Scalar<DataVector>& spin_function, const YlmSpherepack& ylm) noexcept;
+    const Scalar<DataVector>& spin_function,
+    const Strahlkorper<Frame::Inertial>& strahlkorper) noexcept;
+template std::array<double, 3> StrahlkorperGr::spin_vector<Frame::Inertial>(
+    const double spin_magnitude, const Scalar<DataVector>& area_element,
+    const DataVector& radius,
+    const tnsr::i<DataVector, 3, Frame::Inertial>& r_hat,
+    const Scalar<DataVector>& ricci_scalar,
+    const Scalar<DataVector>& spin_function,
+    const Strahlkorper<Frame::Inertial>& strahlkorper) noexcept;
 /// \endcond

@@ -429,14 +429,23 @@ double dimensionful_spin_magnitude(
  * moment vanishes. Also note that \f$x^i - x^i_0\f$ is
  * is the product of `StrahlkorperTags::Rhat` and `StrahlkorperTags::Radius`.
  */
+
 template <typename Frame>
-std::array<double, 3> spin_vector(double spin_magnitude,
-                                  const Scalar<DataVector>& area_element,
-                                  const Scalar<DataVector>& radius,
-                                  const tnsr::i<DataVector, 3, Frame>& r_hat,
-                                  const Scalar<DataVector>& ricci_scalar,
-                                  const Scalar<DataVector>& spin_function,
-                                  const YlmSpherepack& ylm) noexcept;
+void spin_vector(const gsl::not_null<std::array<double, 3>*> result,
+                 double spin_magnitude, const Scalar<DataVector>& area_element,
+                 const DataVector& radius,
+                 const tnsr::i<DataVector, 3, Frame>& r_hat,
+                 const Scalar<DataVector>& ricci_scalar,
+                 const Scalar<DataVector>& spin_function,
+                 const Strahlkorper<Frame>& strahlkorper) noexcept;
+
+template <typename Frame>
+std::array<double, 3> spin_vector(
+    double spin_magnitude, const Scalar<DataVector>& area_element,
+    const DataVector& radius, const tnsr::i<DataVector, 3, Frame>& r_hat,
+    const Scalar<DataVector>& ricci_scalar,
+    const Scalar<DataVector>& spin_function,
+    const Strahlkorper<Frame>& strahlkorper) noexcept;
 
 /*!
  * \ingroup SurfacesGroup
