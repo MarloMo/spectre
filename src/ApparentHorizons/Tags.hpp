@@ -685,6 +685,31 @@ struct DimensionfulSpinMagnitudeCompute : DimensionfulSpinMagnitude,
                  StrahlkorperTags::Strahlkorper<Frame>, AreaElement<Frame>>;
 };
 
+/// The dimensionful spin angular momentum vector.
+template <typename Frame>
+struct DimensionfulSpinVector : db::SimpleTag {
+  using type = std::array<double, 3>;
+};
+
+/// Computes the dimensionful spin angular momentum vector.
+template <typename Frame>
+struct DimensionfulSpinVectorCompute : DimensionfulSpinVector<Frame>,
+                                       db::ComputeTag {
+  using base = DimensionfulSpinVector<Frame>;
+  using return_type = std::array<double, 3>;
+  static constexpr auto function = static_cast<void (*)(
+      const gsl::not_null<std::array<double, 3>*>, double,
+      const Scalar<DataVector>&, const DataVector&,
+      const tnsr::i<DataVector, 3, Frame>&, const Scalar<DataVector>&,
+      const Scalar<DataVector>&, const Strahlkorper<Frame>&) noexcept>(
+      &StrahlkorperGr::spin_vector);
+  using argument_tags =
+      tmpl::list<DimensionfulSpinMagnitude, AreaElement<Frame>,
+                 StrahlkorperTags::Radius<Frame>, StrahlkorperTags::Rhat<Frame>,
+                 StrahlkorperTags::RicciScalar, SpinFunction,
+                 StrahlkorperTags::Strahlkorper<Frame>>;
+};
+
 /// The Christodoulou mass, which is a function of the dimensionful spin
 /// angular momentum and the irreducible mass of a Strahlkorper.
 struct ChristodoulouMass : db::SimpleTag {
