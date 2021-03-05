@@ -204,7 +204,10 @@ struct EvolutionMetavars {
 
   struct AhA {
     using tags_to_observe =
-        tmpl::list<StrahlkorperGr::Tags::AreaCompute<frame>>;
+        tmpl::list<StrahlkorperGr::Tags::AreaCompute<frame>,
+                   StrahlkorperGr::Tags::IrreducibleMassCompute<frame>,
+                   StrahlkorperTags::OneOverOneFormMagnitudeCompute<
+                       size_t Dim, typename Frame, typename DataType>>;
     using compute_items_on_source = tmpl::list<
         gr::Tags::SpatialMetricCompute<volume_dim, frame, DataVector>,
         ah::Tags::InverseSpatialMetricCompute<volume_dim, frame>,
