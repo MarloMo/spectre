@@ -703,9 +703,8 @@ struct DimensionfulSpinVectorCompute : DimensionfulSpinVector, db::ComputeTag {
       const Scalar<DataVector>& spin_function,
       const YlmSpherepack& ylm) noexcept {
     return StrahlkorperGr::spin_vector<Frame>(
-        dimensionful_spin_magnitude, area_element,
-        Scalar<DataVector>{std::move(radius)}, r_hat, ricci_scalar,
-        spin_function, ylm);
+        dimensionful_spin_magnitude, area_element, Scalar<DataVector>{(radius)},
+        r_hat, ricci_scalar, spin_function, ylm);
   }
   using argument_tags =
       tmpl::list<DimensionfulSpinMagnitude, AreaElement<Frame>,
