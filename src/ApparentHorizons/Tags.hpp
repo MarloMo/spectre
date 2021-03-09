@@ -695,7 +695,7 @@ template <typename Frame>
 struct DimensionfulSpinVectorCompute : DimensionfulSpinVector, db::ComputeTag {
   using base = DimensionfulSpinVector;
   using return_type = std::array<double, 3>;
-  static void function(const gsl::not_null<double*> result,
+  static void function(const gsl::not_null<std::array<double, 3>*>,
                        const Scalar<DataVector>& area_element,
                        const DataVector& radius,
                        const tnsr::i<DataVector, 3, Frame>& r_hat,
