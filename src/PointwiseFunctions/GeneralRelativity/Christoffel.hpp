@@ -125,6 +125,30 @@ struct SpatialChristoffelSecondKindCompute
   using base = SpatialChristoffelSecondKind<SpatialDim, Frame, DataType>;
 };
 
+template <size_t SpatialDim, typename Frame, typename DataType>
+struct SpatialChristoffelSecondKindVarsCompute
+    : ::Tags::Variables<tmpl::list<
+          SpatialChristoffelSecondKind<SpatialDim, Frame, DataType>>>,
+      db::ComputeTag {
+  using argument_tags =
+      tmpl::list<SpatialChristoffelFirstKind<SpatialDim, Frame, DataType>,
+                 InverseSpatialMetric<SpatialDim, Frame, DataType>>;
+  using return_type = ::Variables<tmpl::list<
+      gr::Tags::SpatialChristoffelSecondKind<SpatialDim, Frame, DataType>>>;
+  static void function(
+      gsl::not_null<
+          ::Variables<tmpl::list<gr::Tags::SpatialChristoffelSecondKind<
+              SpatialDim, Frame, DataType>>>*>
+          result,
+      const tnsr::ijj<DataType, SpatialDim, Frame>& christoffel,
+      const tnsr::II<DataType, SpatialDim, Frame>& inverse_spatial_metric) {
+    *result = variables_from_tagged_tuple(
+        tuples::TaggedTuple<
+            SpatialChristoffelSecondKind<SpatialDim, Frame, DataType>>(
+            raise_or_lower_first_index(christoffel, inverse_spatial_metric)));
+  }
+};
+
 /// Compute item for the trace of the spatial Christoffel symbols
 /// of the first kind
 /// \f$\Gamma_{i} = \Gamma_{ijk}\gamma^{jk}\f$ computed from the
