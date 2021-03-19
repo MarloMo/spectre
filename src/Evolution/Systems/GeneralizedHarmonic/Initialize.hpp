@@ -32,16 +32,19 @@
 #include "PointwiseFunctions/GeneralRelativity/GeneralizedHarmonic/SpatialDerivOfLapse.hpp"
 #include "PointwiseFunctions/GeneralRelativity/GeneralizedHarmonic/SpatialDerivOfShift.hpp"
 #include "PointwiseFunctions/GeneralRelativity/GeneralizedHarmonic/TimeDerivOfLapse.hpp"
+#include "PointwiseFunctions/GeneralRelativity/DerivativesOfSpacetimeMetric.hpp"
 #include "PointwiseFunctions/GeneralRelativity/GeneralizedHarmonic/TimeDerivOfShift.hpp"
 #include "PointwiseFunctions/GeneralRelativity/GeneralizedHarmonic/TimeDerivOfSpatialMetric.hpp"
 #include "PointwiseFunctions/GeneralRelativity/InverseSpacetimeMetric.hpp"
 #include "PointwiseFunctions/GeneralRelativity/Lapse.hpp"
+#include "PointwiseFunctions/GeneralRelativity/Ricci.hpp"
 #include "PointwiseFunctions/GeneralRelativity/Shift.hpp"
 #include "PointwiseFunctions/GeneralRelativity/SpacetimeMetric.hpp"
 #include "PointwiseFunctions/GeneralRelativity/SpacetimeNormalOneForm.hpp"
 #include "PointwiseFunctions/GeneralRelativity/SpacetimeNormalVector.hpp"
 #include "PointwiseFunctions/GeneralRelativity/SpatialMetric.hpp"
 #include "PointwiseFunctions/GeneralRelativity/Tags.hpp"
+#include "PointwiseFunctions/GeneralRelativity/WeylElectric.hpp"
 #include "Utilities/ErrorHandling/Assert.hpp"
 #include "Utilities/Gsl.hpp"
 #include "Utilities/TMPL.hpp"
@@ -100,10 +103,36 @@ struct InitializeGhAnd3Plus1Variables {
       gr::Tags::SpacetimeNormalOneFormCompute<Dim, frame, DataVector>,
       gr::Tags::SpacetimeNormalVectorCompute<Dim, frame, DataVector>,
       gr::Tags::InverseSpacetimeMetricCompute<Dim, frame, DataVector>,
+      GeneralizedHarmonic::Tags::DerivSpatialMetricCompute<Dim, frame>,
+      GeneralizedHarmonic::Tags::DerivLapseCompute<Dim, frame>,
+      GeneralizedHarmonic::Tags::DerivShiftCompute<Dim, frame>,
+      GeneralizedHarmonic::Tags::TimeDerivSpatialMetricCompute<Dim, frame>,
+      GeneralizedHarmonic::Tags::TimeDerivLapseCompute<Dim, frame>,
+      GeneralizedHarmonic::Tags::TimeDerivShiftCompute<Dim, frame>,
+      gr::Tags::DerivativesOfSpacetimeMetricCompute<Dim, frame>,
       GeneralizedHarmonic::Tags::ThreeIndexConstraintCompute<Dim, frame>,
-      ConstraintDamping::Tags::ConstraintGamma0Compute<Dim, frame>,
-      ConstraintDamping::Tags::ConstraintGamma1Compute<Dim, frame>,
-      ConstraintDamping::Tags::ConstraintGamma2Compute<Dim, frame>>;
+      gr::Tags::SpacetimeChristoffelFirstKindCompute<Dim, frame, DataVector>,
+      gr::Tags::SpacetimeChristoffelSecondKindCompute<Dim, frame, DataVector>,
+      gr::Tags::TraceSpacetimeChristoffelFirstKindCompute<Dim, frame,
+                                                          DataVector>,
+      gr::Tags::SpatialChristoffelFirstKindCompute<Dim, frame, DataVector>,
+      gr::Tags::SpatialChristoffelSecondKindVarsCompute<Dim, frame, DataVector>,
+      ::Tags::DerivCompute<
+          ::Tags::Variables<tmpl::list<
+              gr::Tags::SpatialChristoffelSecondKind<Dim, frame, DataVector>>>,
+          domain::Tags::InverseJacobian<Dim, Frame::Logical, Frame::Inertial>>,
+      gr::Tags::TraceSpatialChristoffelFirstKindCompute<Dim, frame, DataVector>,
+      gr::Tags::SpatialRicciCompute<Dim, frame, DataVector>,
+      GeneralizedHarmonic::Tags::ExtrinsicCurvatureCompute<Dim, frame>,
+      GeneralizedHarmonic::Tags::TraceExtrinsicCurvatureCompute<Dim, frame>,
+      GeneralizedHarmonic::ConstraintDamping::Tags::ConstraintGamma0Compute<
+          Dim, frame>,
+      GeneralizedHarmonic::ConstraintDamping::Tags::ConstraintGamma1Compute<
+          Dim, frame>,
+      GeneralizedHarmonic::ConstraintDamping::Tags::ConstraintGamma2Compute<
+          Dim, frame>,
+    gr::Tags::WeylElectricCompute<Dim, frame, DataVector>,
+    gr::Tags::WeylElectricScalarCompute<Dim, frame, DataVector>>;
 
   using const_global_cache_tags = tmpl::list<
       GeneralizedHarmonic::ConstraintDamping::Tags::DampingFunctionGamma0<
