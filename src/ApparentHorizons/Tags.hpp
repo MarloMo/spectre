@@ -695,17 +695,7 @@ template <typename Frame>
 struct DimensionfulSpinVectorCompute : DimensionfulSpinVector, db::ComputeTag {
   using base = DimensionfulSpinVector;
   using return_type = std::array<double, 3>;
-  static void function(const gsl::not_null<std::array<double, 3>*>,
-                       const Scalar<DataVector>& area_element,
-                       const DataVector& radius,
-                       const tnsr::i<DataVector, 3, Frame>& r_hat,
-                       const Scalar<DataVector>& ricci_scalar,
-                       const Scalar<DataVector>& spin_function,
-                       const YlmSpherepack& ylm) noexcept {
-    return StrahlkorperGr::spin_vector<Frame>(
-        dimensionful_spin_magnitude, area_element, Scalar<DataVector>{(radius)},
-        r_hat, ricci_scalar, spin_function, ylm);
-  }
+  static constexpr auto function = &StrahlkorperGr::spin_vector<Frame>;
   using argument_tags =
       tmpl::list<DimensionfulSpinMagnitude, AreaElement<Frame>,
                  StrahlkorperTags::Radius<Frame>, StrahlkorperTags::Rhat<Frame>,
