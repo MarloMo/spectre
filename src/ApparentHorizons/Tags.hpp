@@ -701,5 +701,7 @@ struct ChristodoulouMassCompute : ChristodoulouMass, db::ComputeTag {
   using argument_tags = tmpl::list<DimensionfulSpinMagnitude, IrreducibleMass>;
 };
 
+/// THIS IS A TEST ///
+
 }  // namespace Tags
 }  // namespace StrahlkorperGr
