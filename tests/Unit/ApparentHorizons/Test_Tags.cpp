@@ -299,6 +299,46 @@ void test_min_ricci_scalar() {
   CHECK(expected_min == min);
 }
 
+void test_dimensionful_spin_vector_compute_tag() noexcept {
+  const double dimensionful_spin_magnitude{5.0};
+  const Scalar<DataVector> area_element{{{{1., 2., 3.}}}};
+  const DataVector radius{1., 2., 3.};
+  const tnsr::i<DataVector, 3, Frame::Inertial> r_hat{3_st};
+  get<0>(r_hat) = DataVector{3., 4., 5.};
+  get<1>(r_hat) = DataVector{3., 4., 5.};
+  get<2>(r_hat) = DataVector{3., 4., 5.};
+  const Scalar<DataVector> ricci_scalar{{{{1., 2., 3.}}}};
+  const Scalar<DataVector> spin_function{{{{1., 2., 3.}}}};
+  const double y11_amplitude = 1.0;
+  const double y11_radius = 2.0;
+  const std::array<double, 3> center = {{0.1, 0.2, 0.3}};
+  // create a strahlkorper
+  const auto strahlkorper =
+      create_strahlkorper_y11(y11_amplitude, y11_radius, center);
+
+  // Now construct a Y00 + Im(Y11) surface by hand.
+  const auto ylm = strahlkorper.ylm_spherepack();
+  const auto
+      box = db::create<
+          db::AddSimpleTags<StrahlkorperGr::Tags::DimensionfulSpinMagnitude>
+              StrahlkorperGr::Tags::AreaElement<Frame::Inertial>,
+          StrahlkorperTags::Radius<Frame::Inertial>,
+          StrahlkorperTags::Rhat<Frame::Inertial>,
+          StrahlkorperTags::RicciScalar, StrahlkorperGr::Tags::SpinFunction,
+          StrahlkorperTags::Strahlkorper<Frame::Inertial>>,
+      db::AddComputeTags<DimensionfulSpinVectorCompute<Frame::Inertial>> >
+          (dimensionful_spin_magnitude, area_element, radius, r_hat,
+           ricci_scalar, spin_function, ylm);
+  // LHS of the == in the CHECK is retrieving the computed dimensionful spin
+  // vector from your DimensionfulSpinVectorCompute tag and RHS of ==
+  // should be same logic as DimensionfulSpinVectorCompute::function
+  CHECK(db::get<StrahlkorperGr::Tags::DimensionfulSpinVector>(box) ==
+        StrahlkorperGr::spin_vector<Frame::Inertial>(
+            dimensionful_spin_magnitude, area_element,
+            Scalar<DataVector>{(radius)}, r_hat, ricci_scalar, spin_function,
+            ylm));
+}
+
 struct SomeType {};
 struct SomeTag : db::SimpleTag {
   using type = SomeType;
@@ -313,6 +353,7 @@ SPECTRE_TEST_CASE("Unit.ApparentHorizons.StrahlkorperDataBox",
   test_normals();
   test_max_ricci_scalar();
   test_min_ricci_scalar();
+  test_dimensionful_spin_vector_compute_tag();
   TestHelpers::db::test_simple_tag<ah::Tags::FastFlow>("FastFlow");
   TestHelpers::db::test_simple_tag<StrahlkorperGr::Tags::Area>("Area");
   TestHelpers::db::test_simple_tag<StrahlkorperGr::Tags::IrreducibleMass>(
