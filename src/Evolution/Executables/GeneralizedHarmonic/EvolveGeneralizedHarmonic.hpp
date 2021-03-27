@@ -223,7 +223,7 @@ struct EvolutionMetavars {
                        StrahlkorperTags::RhatCompute<frame>,
                        StrahlkorperTags::NormalOneFormCompute<frame>,
                        StrahlkorperTags::OneOverOneFormMagnitudeCompute<
-                           size_t Dim, frame, typename DataType>>,
+                           volume_dim, frame, DataVector>>,
             tags_to_observe>;
     using compute_target_points =
         intrp::TargetPoints::ApparentHorizon<AhA, ::Frame::Inertial>;
