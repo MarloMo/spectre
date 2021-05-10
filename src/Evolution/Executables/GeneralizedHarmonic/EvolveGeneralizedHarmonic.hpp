@@ -210,7 +210,8 @@ struct EvolutionMetavars {
                    gr::Tags::SpatialChristoffelSecondKind<volume_dim, frame>>;
     using compute_items_on_target =
         tmpl::append<tmpl::list<StrahlkorperGr::Tags::AreaElementCompute<frame>,
-                                StrahlkorperTags::ThetaPhiCompute<frame>>,
+                                StrahlkorperTags::ThetaPhiCompute<frame>,
+                                StrahlkorperTags::RhatCompute<frame>>,
                      tags_to_observe>;
     using compute_target_points =
         intrp::TargetPoints::ApparentHorizon<AhA, ::Frame::Inertial>;
