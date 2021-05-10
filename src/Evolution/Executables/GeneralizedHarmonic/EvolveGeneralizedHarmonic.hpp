@@ -209,16 +209,9 @@ struct EvolutionMetavars {
                    gr::Tags::ExtrinsicCurvature<volume_dim, frame>,
                    gr::Tags::SpatialChristoffelSecondKind<volume_dim, frame>>;
     using compute_items_on_target =
-        tmpl::append <
-        tmpl::list<StrahlkorperGr::Tags::AreaElementCompute<frame>,
-                   StrahlkorperTags::ThetaPhiCompute<frame>,
-                   StrahlkorperTags::RhatCompute<frame>,
-                   StrahlkorperTags::NormalOneFormCompute<frame>,
-                   StrahlkorperTags::OneOverOneFormMagnitudeCompute<
-                       volume_dim, frame, DataVector>,
-                   StrahlkorperTags::UnitNormalOneFormCompute<frame>,
-                   StrahlkorperTags::UnitNormalVectorCompute<frame>,
-                   StrahlkorperTags::RicciScalarCompute<frame>>;
+        tmpl::append<tmpl::list<StrahlkorperGr::Tags::AreaElementCompute<frame>,
+                                StrahlkorperTags::ThetaPhiCompute<frame>>,
+                     tags_to_observe>;
     using compute_target_points =
         intrp::TargetPoints::ApparentHorizon<AhA, ::Frame::Inertial>;
     using post_interpolation_callback =
