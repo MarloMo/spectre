@@ -163,9 +163,7 @@ void test_radius_and_derivs() {
   }
   const auto& strahlkorper_laplacian =
       db::get<StrahlkorperTags::LaplacianRadius<Frame::Inertial>>(box);
-  Approx numerical_approx = Approx::custom().epsilon(1.0e-10).scale(1.);
-  CHECK_ITERABLE_CUSTOM_APPROX(strahlkorper_laplacian, expected_laplacian,
-                               numerical_approx);
+  CHECK_ITERABLE_APPROX(strahlkorper_laplacian, expected_laplacian);
 }
 
 void test_normals() {
@@ -314,15 +312,12 @@ void test_dimensionful_spin_vector_compute_tag() noexcept {
   // create a strahlkorper
   const auto strahlkorper =
       create_strahlkorper_y11(y11_amplitude, y11_radius, center);
-  // const auto ylm = strahlkorper.ylm_spherepack(); // gtes ylm from
-  // strahlkorper const size_t ylm_physical_size = ylm.physical_size(); // get
-  // physical size of ylm
   const size_t ylm_physical_size =
       strahlkorper.ylm_spherepack().physical_size();
-  const DataVector used_for_size = DataVector(
-      ylm_physical_size, std::numeric_limits<double>::signaling_NaN());
+  const DataVector used_for_size(ylm_physical_size,
+                                 std::numeric_limits<double>::signaling_NaN());
 
-  // Creates a variable names generator that can be used to generate random
+  // Creates a variable named generator that can be used to generate random
   // values
   MAKE_GENERATOR(generator);
   // Creates a uniform distribution, which will be used to generate random
@@ -343,9 +338,6 @@ void test_dimensionful_spin_vector_compute_tag() noexcept {
       make_not_null(&generator), dist, used_for_size);
   const auto spin_function = make_with_random_values<Scalar<DataVector>>(
       make_not_null(&generator), dist, used_for_size);
-
-  // Now construct a Y00 + Im(Y11) surface by hand.
-  //   const auto ylm = strahlkorper.ylm_spherepack();
   const auto box = db::create<
       db::AddSimpleTags<StrahlkorperGr::Tags::DimensionfulSpinMagnitude,
                         StrahlkorperGr::Tags::AreaElement<Frame::Inertial>,
