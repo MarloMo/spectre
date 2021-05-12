@@ -352,13 +352,11 @@ void test_dimensionful_spin_vector_compute_tag() noexcept {
   // LHS of the == in the CHECK is retrieving the computed dimensionful spin
   // vector from your DimensionfulSpinVectorCompute tag and RHS of ==
   // should be same logic as DimensionfulSpinVectorCompute::function
-  const bool check =
-      db::get<StrahlkorperGr::Tags::DimensionfulSpinVector<Frame::Inertial>>(
-          box) ==
-      StrahlkorperGr::spin_vector<Frame::Inertial>(
-          dimensionful_spin_magnitude, area_element, radius,
-          r_hat, ricci_scalar, spin_function, strahlkorper);
-  CHECK(check);
+  CHECK(db::get<StrahlkorperGr::Tags::DimensionfulSpinVector<Frame::Inertial>>(
+            box) ==
+        StrahlkorperGr::spin_vector<Frame::Inertial>(
+            dimensionful_spin_magnitude, area_element, radius, r_hat,
+            ricci_scalar, spin_function, strahlkorper));
 }
 
 struct SomeType {};
