@@ -211,7 +211,8 @@ struct EvolutionMetavars {
     using compute_items_on_target =
         tmpl::append<tmpl::list<StrahlkorperGr::Tags::AreaElementCompute<frame>,
                                 StrahlkorperTags::ThetaPhiCompute<frame>,
-                                StrahlkorperTags::RhatCompute<frame>>,
+                                StrahlkorperTags::RhatCompute<frame>,
+                                StrahlkorperTags::NormalOneFormCompute<frame>>,
                      tags_to_observe>;
     using compute_target_points =
         intrp::TargetPoints::ApparentHorizon<AhA, ::Frame::Inertial>;
