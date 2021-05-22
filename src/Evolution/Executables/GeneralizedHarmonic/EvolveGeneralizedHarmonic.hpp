@@ -202,12 +202,14 @@ struct EvolutionMetavars {
         gr::Tags::SpatialMetricCompute<volume_dim, frame, DataVector>,
         ah::Tags::InverseSpatialMetricCompute<volume_dim, frame>,
         ah::Tags::ExtrinsicCurvatureCompute<volume_dim, frame>,
-        ah::Tags::SpatialChristoffelSecondKindCompute<volume_dim, frame>>;
-    using vars_to_interpolate_to_target =
-        tmpl::list<gr::Tags::SpatialMetric<volume_dim, frame, DataVector>,
-                   gr::Tags::InverseSpatialMetric<volume_dim, frame>,
-                   gr::Tags::ExtrinsicCurvature<volume_dim, frame>,
-                   gr::Tags::SpatialChristoffelSecondKind<volume_dim, frame>>;
+        ah::Tags::SpatialChristoffelSecondKindCompute<volume_dim, frame>,
+        gr::Tags::SpatialRicciCompute<volume_dim, frame, DataVector>>;
+    using vars_to_interpolate_to_target = tmpl::list<
+        gr::Tags::SpatialMetric<volume_dim, frame, DataVector>,
+        gr::Tags::InverseSpatialMetric<volume_dim, frame>,
+        gr::Tags::ExtrinsicCurvature<volume_dim, frame>,
+        gr::Tags::SpatialChristoffelSecondKind<volume_dim, frame>,
+        gr::Tags::SpatialRicciCompute<volume_dim, frame, DataVector>>;
     using compute_items_on_target = tmpl::append<
         tmpl::list<StrahlkorperGr::Tags::AreaElementCompute<frame>,
                    StrahlkorperTags::ThetaPhiCompute<frame>,
