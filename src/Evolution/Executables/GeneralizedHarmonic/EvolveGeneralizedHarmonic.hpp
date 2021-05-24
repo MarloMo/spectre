@@ -202,14 +202,13 @@ struct EvolutionMetavars {
         gr::Tags::SpatialMetricCompute<volume_dim, frame, DataVector>,
         ah::Tags::InverseSpatialMetricCompute<volume_dim, frame>,
         ah::Tags::ExtrinsicCurvatureCompute<volume_dim, frame>,
-        ah::Tags::SpatialChristoffelSecondKindCompute<volume_dim, frame>,
-        gr::Tags::SpatialRicciCompute<volume_dim, frame, DataVector>>;
-    using vars_to_interpolate_to_target = tmpl::list<
-        gr::Tags::SpatialMetric<volume_dim, frame, DataVector>,
-        gr::Tags::InverseSpatialMetric<volume_dim, frame>,
-        gr::Tags::ExtrinsicCurvature<volume_dim, frame>,
-        gr::Tags::SpatialChristoffelSecondKind<volume_dim, frame>,
-        gr::Tags::SpatialRicciCompute<volume_dim, frame, DataVector>>;
+        ah::Tags::SpatialChristoffelSecondKindCompute<volume_dim, frame>>;
+    using vars_to_interpolate_to_target =
+        tmpl::list<gr::Tags::SpatialMetric<volume_dim, frame, DataVector>,
+                   gr::Tags::InverseSpatialMetric<volume_dim, frame>,
+                   gr::Tags::ExtrinsicCurvature<volume_dim, frame>,
+                   gr::Tags::SpatialChristoffelSecondKind<volume_dim, frame>,
+                   gr::Tags::SpatialRicci<volume_dim, frame, DataVector>>;
     using compute_items_on_target = tmpl::append<
         tmpl::list<StrahlkorperGr::Tags::AreaElementCompute<frame>,
                    StrahlkorperTags::ThetaPhiCompute<frame>,
@@ -218,7 +217,8 @@ struct EvolutionMetavars {
                    StrahlkorperTags::OneOverOneFormMagnitudeCompute<
                        volume_dim, frame, DataVector>,
                    StrahlkorperTags::UnitNormalOneFormCompute<frame>,
-                   StrahlkorperTags::UnitNormalVectorCompute<frame>>,
+                   StrahlkorperTags::UnitNormalVectorCompute<frame>,
+                   StrahlkorperTags::RicciScalarCompute<frame>>,
         tags_to_observe>;
     using compute_target_points =
         intrp::TargetPoints::ApparentHorizon<AhA, ::Frame::Inertial>;
@@ -231,7 +231,8 @@ struct EvolutionMetavars {
   using interpolator_source_vars =
       tmpl::list<gr::Tags::SpacetimeMetric<volume_dim, frame>,
                  GeneralizedHarmonic::Tags::Pi<volume_dim, frame>,
-                 GeneralizedHarmonic::Tags::Phi<volume_dim, frame>>;
+                 GeneralizedHarmonic::Tags::Phi<volume_dim, frame>,
+                 gr::Tags::SpatialRicci<volume_dim, frame, DataVector>>;
 
   using observation_events = tmpl::list<
       dg::Events::Registrars::ObserveErrorNorms<Tags::Time,
