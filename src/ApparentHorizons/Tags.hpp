@@ -343,21 +343,28 @@ struct UnitNormalVectorCompute : UnitNormalVector<Frame>, db::ComputeTag {
   using return_type = tnsr::I<DataVector, 3, Frame>;
 };
 
-/// Computes 3-covariant gradient of a Strahlkorper's normal
+/// The 3-covariant gradient \f$D_i S_j\f$ of a Strahlkorper's normal
 template <typename Frame>
 struct GradUnitNormalOneForm : db::SimpleTag {
   using type = tnsr::ii<DataVector, 3, Frame>;
 };
-
+/// Computes 3-covariant gradient \f$D_i S_j\f$ of a Strahlkorper's normal
 template <typename Frame>
 struct GradUnitNormalOneFormCompute : GradUnitNormalOneForm<Frame>,
                                       db::ComputeTag {
-  static constexpr auto function =
-      &StrahlkorperGr::grad_unit_normal_one_form<Frame>;
+  using base = GradUnitNormalOneForm<Frame>;
+  static constexpr auto function = static_cast<void (*)(
+      const gsl::not_null<tnsr::ii<DataVector, 3, Frame>*>,
+      const tnsr::i<DataVector, 3, Frame>&, const DataVector&,
+      const tnsr::i<DataVector, 3, Frame>&,
+      const tnsr::ii<DataVector, 3, Frame>&, const DataVector&,
+      const tnsr::Ijj<DataVector, 3, Frame>&) noexcept>(
+      &StrahlkorperGr::grad_unit_normal_one_form<Frame>);
   using argument_tags =
       tmpl::list<Rhat<Frame>, Radius<Frame>, UnitNormalOneForm<Frame>,
                  D2xRadius<Frame>, OneOverOneFormMagnitude,
                  gr::Tags::SpatialChristoffelSecondKind<3, Frame, DataVector>>;
+  using return_type = tnsr::ii<DataVector, 3, Frame>;
 };
 
 /// Ricci scalar is the two-dimensional intrinsic Ricci scalar curvature
