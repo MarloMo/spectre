@@ -339,6 +339,9 @@ SPECTRE_TEST_CASE("Unit.ApparentHorizons.StrahlkorperDataBox",
       StrahlkorperTags::GradUnitNormalOneForm<Frame::Inertial>>(
       "GradUnitNormalOneForm");
   TestHelpers::db::test_simple_tag<
+      StrahlkorperTags::ExtrinsicCurvature<Frame::Inertial>>(
+      "ExtrinsicCurvature");
+  TestHelpers::db::test_simple_tag<
       StrahlkorperTags::UnitNormalVector<Frame::Inertial>>("UnitNormalVector");
   TestHelpers::db::test_simple_tag<
       StrahlkorperTags::Strahlkorper<Frame::Inertial>>("Strahlkorper");
@@ -446,6 +449,9 @@ SPECTRE_TEST_CASE("Unit.ApparentHorizons.StrahlkorperDataBox",
   TestHelpers::db::test_compute_tag<
       StrahlkorperTags::GradUnitNormalOneFormCompute<Frame::Inertial>>(
       "GradUnitNormalOneForm");
+  TestHelpers::db::test_compute_tag<
+      StrahlkorperTags::ExtrinsicCurvatureCompute<Frame::Inertial>>(
+      "ExtrinsicCurvature");
   TestHelpers::db::test_compute_tag<
       StrahlkorperTags::UnitNormalVectorCompute<Frame::Inertial>>(
       "UnitNormalVector");

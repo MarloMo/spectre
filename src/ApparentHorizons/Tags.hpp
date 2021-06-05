@@ -367,6 +367,28 @@ struct GradUnitNormalOneFormCompute : GradUnitNormalOneForm<Frame>,
   using return_type = tnsr::ii<DataVector, 3, Frame>;
 };
 
+/// Extrinsic curvature of a 2D Strahlkorper embedded in a 3D space.
+template <typename Frame>
+struct ExtrinsicCurvature : db::SimpleTag {
+  using type = tnsr::ii<DataVector, 3, Frame>;
+};
+/// Calculates the Extrinsic curvature of a 2D Strahlkorper embedded in a 3D
+/// space.
+template <typename Frame>
+struct ExtrinsicCurvatureCompute : ExtrinsicCurvature<Frame>, db::ComputeTag {
+  using base = ExtrinsicCurvature<Frame>;
+  static constexpr auto function =
+      static_cast<void (*)(const gsl::not_null<tnsr::ii<DataVector, 3, Frame>*>,
+                           const tnsr::ii<DataVector, 3, Frame>&,
+                           const tnsr::i<DataVector, 3, Frame>&,
+                           const tnsr::I<DataVector, 3, Frame>&) noexcept>(
+          &StrahlkorperGr::extrinsic_curvature<Frame>);
+  using argument_tags =
+      tmpl::list<GradUnitNormalOneForm<Frame>, UnitNormalOneForm<Frame>,
+                 UnitNormalVector<Frame>>;
+  using return_type = tnsr::ii<DataVector, 3, Frame>;
+};
+
 /// Ricci scalar is the two-dimensional intrinsic Ricci scalar curvature
 /// of a Strahlkorper
 struct RicciScalar : db::SimpleTag {
