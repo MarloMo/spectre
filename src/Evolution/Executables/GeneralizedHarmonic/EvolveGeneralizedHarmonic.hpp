@@ -219,6 +219,8 @@ struct EvolutionMetavars {
                        volume_dim, frame, DataVector>,
                    StrahlkorperTags::UnitNormalOneFormCompute<frame>,
                    StrahlkorperTags::UnitNormalVectorCompute<frame>,
+                   StrahlkorperTags::GradUnitNormalOneFormCompute<frame>,
+                   StrahlkorperTags::ExtrinsicCurvatureCompute<frame>,
                    StrahlkorperTags::RicciScalarCompute<frame>>,
         tags_to_observe>;
     using compute_target_points =

@@ -407,7 +407,7 @@ struct RicciScalarCompute : RicciScalar, db::ComputeTag {
       &StrahlkorperGr::ricci_scalar<Frame>);
   using argument_tags =
       tmpl::list<gr::Tags::SpatialRicci<3, Frame, DataVector>,
-                 UnitNormalVector<Frame>, gr::Tags::ExtrinsicCurvature<3>,
+                 UnitNormalVector<Frame>, ExtrinsicCurvature<Frame>,
                  gr::Tags::InverseSpatialMetric<3, Frame, DataVector>>;
   using return_type = Scalar<DataVector>;
 };
