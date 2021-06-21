@@ -61,28 +61,46 @@ struct EvolutionMetavars
   struct AhA {
     using tags_to_observe =
         tmpl::list<StrahlkorperGr::Tags::AreaCompute<frame>,
+<<<<<<< HEAD
                    StrahlkorperGr::Tags::IrreducibleMassCompute<frame>>;
     using compute_vars_to_interpolate = ah::ComputeHorizonVolumeQuantities;
+=======
+                   StrahlkorperGr::Tags::IrreducibleMassCompute<frame>,
+                   StrahlkorperTags::MinRicciScalarCompute,
+                   StrahlkorperTags::MaxRicciScalarCompute> ;
+    using compute_items_on_source = tmpl::list<
+        gr::Tags::SpatialMetricCompute<volume_dim, frame, DataVector>,
+        ah::Tags::InverseSpatialMetricCompute<volume_dim, frame>,
+        ah::Tags::ExtrinsicCurvatureCompute<volume_dim, frame>,
+        ah::Tags::SpatialChristoffelSecondKindCompute<volume_dim, frame>>;
+>>>>>>> Add tags to EvolveGeneralizedHarmonic Executable
     using vars_to_interpolate_to_target =
         tmpl::list<gr::Tags::SpatialMetric<volume_dim, frame, DataVector>,
                    gr::Tags::InverseSpatialMetric<volume_dim, frame>,
                    gr::Tags::ExtrinsicCurvature<volume_dim, frame>,
-                   gr::Tags::SpatialChristoffelSecondKind<volume_dim, frame>>;
+                   gr::Tags::SpatialChristoffelSecondKind<volume_dim, frame>,
+                   gr::Tags::SpatialRicci<volume_dim, frame, DataVector>>;
     using compute_items_on_target = tmpl::append<
-        tmpl::list<StrahlkorperGr::Tags::AreaElementCompute<frame>,
-                   StrahlkorperTags::ThetaPhiCompute<frame>,
-                   StrahlkorperTags::RadiusCompute<frame>,
-                   StrahlkorperTags::RhatCompute<frame>,
-                   StrahlkorperTags::InvJacobianCompute<frame>,
-                   StrahlkorperTags::DxRadiusCompute<frame>,
-                   StrahlkorperTags::OneOverOneFormMagnitudeCompute<
-                       volume_dim, frame, DataVector>,
-                   StrahlkorperTags::NormalOneFormCompute<frame>,
-                   StrahlkorperTags::UnitNormalOneFormCompute<frame>,
-                   StrahlkorperTags::UnitNormalVectorCompute<frame>,
-                   StrahlkorperTags::GradUnitNormalOneFormCompute<frame>,
-                   StrahlkorperTags::ExtrinsicCurvatureCompute<frame>,
-                   StrahlkorperGr::Tags::SpinFunctionCompute<frame>>,
+        tmpl::list<
+            StrahlkorperGr::Tags::AreaElementCompute<frame>,
+            StrahlkorperTags::ThetaPhiCompute<frame>,
+            StrahlkorperTags::JacobianCompute<frame>,
+            StrahlkorperTags::TangentsCompute<frame>,
+            StrahlkorperTags::RadiusCompute<frame>,
+            StrahlkorperTags::RhatCompute<frame>,
+            StrahlkorperTags::InvJacobianCompute<frame>,
+            StrahlkorperTags::DxRadiusCompute<frame>,
+            StrahlkorperTags::OneOverOneFormMagnitudeCompute<volume_dim, frame,
+                                                             DataVector>,
+            StrahlkorperTags::NormalOneFormCompute<frame>,
+            StrahlkorperTags::UnitNormalOneFormCompute<frame>,
+            StrahlkorperTags::UnitNormalVectorCompute<frame>,
+            StrahlkorperTags::GradUnitNormalOneFormCompute<frame>,
+            StrahlkorperTags::ExtrinsicCurvatureCompute<frame>,
+            StrahlkorperGr::Tags::SpinFunctionCompute<frame>,
+            StrahlkorperTags::RicciScalarCompute<frame>,
+            StrahlkorperGr::Tags::DimensionfulSpinMagnitudeCompute<frame>,
+            StrahlkorperGr::Tags::DimensionfulSpinVectorCompute<frame>>,
         tags_to_observe>;
     using compute_target_points =
         intrp::TargetPoints::ApparentHorizon<AhA, ::Frame::Inertial>;
@@ -98,7 +116,8 @@ struct EvolutionMetavars
   using interpolator_source_vars =
       tmpl::list<gr::Tags::SpacetimeMetric<volume_dim, frame>,
                  GeneralizedHarmonic::Tags::Pi<volume_dim, frame>,
-                 GeneralizedHarmonic::Tags::Phi<volume_dim, frame>>;
+                 GeneralizedHarmonic::Tags::Phi<volume_dim, frame>,
+                 gr::Tags::SpatialRicci<volume_dim, frame, DataVector>>;
 
   struct factory_creation
       : tt::ConformsTo<Options::protocols::FactoryCreation> {
