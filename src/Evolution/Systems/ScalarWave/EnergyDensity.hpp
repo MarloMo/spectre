@@ -3,8 +3,6 @@
 
 #pragma once
 
-#include "Evolution/Systems/ScalarWave/EnergyDensity.hpp"
-
 #include "DataStructures/Tensor/EagerMath/Magnitude.hpp"
 #include "DataStructures/Tensor/Tensor.hpp"
 #include "Utilities/Gsl.hpp"

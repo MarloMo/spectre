@@ -117,11 +117,11 @@ template <size_t SpatialDim>
 struct EnergyDensityCompute : EnergyDensity<SpatialDim>, db::ComputeTag {
   using base = EnergyDensity<SpatialDim>;
   using return_type = Scalar<DataVector>;
-  static constexpr void function(
+  static void function(
       const gsl::not_null<Scalar<DataVector>*> result,
       const Scalar<DataVector>& pi,
       const tnsr::i<DataVector, SpatialDim, Frame::Inertial>& phi) noexcept {
-    ScalarWave::energy_density(result, pi, phi);
+    ScalarWave::energy_density<SpatialDim>(result, pi, phi);
   };
   using argument_tags = tmpl::list<ScalarWave::Pi, ScalarWave::Phi<SpatialDim>>;
 };
