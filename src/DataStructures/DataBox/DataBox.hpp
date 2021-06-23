@@ -910,6 +910,10 @@ SPECTRE_ALWAYS_INLINE constexpr auto create(Args&&... args) {
   static_assert(tt::is_a_v<tmpl::list, AddMutableItemTags>,
                 "AddMutableItemTags must be a tmpl::list");
   static_assert(
+      tmpl::all<AddMutableItemTags, is_non_base_tag<tmpl::_1>>::value and
+          tmpl::all<AddImmutableItemTags, is_non_base_tag<tmpl::_1>>::value,
+      "Can only add tags derived from db::SimpleTag.");
+  static_assert(
       tmpl::all<AddMutableItemTags, is_mutable_item_tag<tmpl::_1>>::value,
       "Cannot add any ComputeTags or ReferenceTags in the AddMutableTags list, "
       "must use the AddImmutableItemTags list.");
@@ -1040,13 +1044,19 @@ CREATE_IS_CALLABLE_V(apply)
 
 template <typename Func, typename... Args>
 constexpr void error_function_not_callable() noexcept {
-  static_assert(std::is_same_v<Func, void>,
-                "The function is not callable with the expected arguments.  "
-                "See the first template parameter of "
-                "error_function_not_callable for the function type and "
-                "the remaining arguments for the parameters that cannot be "
-                "passed. If all the argument types match, it could be that you "
-                "have a template parameter that cannot be deduced.");
+  static_assert(
+      std::is_same_v<Func, void>,
+      "The function is not callable with the expected arguments.  "
+      "See the first template parameter of "
+      "error_function_not_callable for the function or object type and "
+      "the remaining arguments for the parameters that cannot be "
+      "passed. If all the argument types match, it could be that you "
+      "have a template parameter that cannot be deduced."
+      "Note that for most DataBox functions, you must pass either "
+      "a function pointer, a lambda, or a class with a call operator "
+      "or static apply function, and this error will also arise if "
+      "the provided entity does not satisfy that requirement (e.g. "
+      "if the provided class defines a function with the incorrect name).");
 }
 
 template <typename DataBoxTags, typename... TagsToRetrieve>
