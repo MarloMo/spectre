@@ -53,6 +53,7 @@
 #include "Parallel/RegisterDerivedClassesWithCharm.hpp"
 #include "ParallelAlgorithms/Actions/MutateApply.hpp"
 #include "ParallelAlgorithms/Events/Factory.hpp"  // IWYU pragma: keep
+#include "ParallelAlgorithms/Events/ObserveVolumeIntegrals.hpp"
 #include "ParallelAlgorithms/EventsAndTriggers/Actions/RunEventsAndTriggers.hpp"  // IWYU pragma: keep
 #include "ParallelAlgorithms/EventsAndTriggers/Completion.hpp"
 #include "ParallelAlgorithms/EventsAndTriggers/Event.hpp"
@@ -128,19 +129,24 @@ struct EvolutionMetavars {
       : tt::ConformsTo<Options::protocols::FactoryCreation> {
     using factory_classes = tmpl::map<
         tmpl::pair<DenseTrigger, DenseTriggers::standard_dense_triggers>,
-        tmpl::pair<Event, tmpl::flatten<tmpl::list<
-                              Events::Completion,
-                              dg::Events::field_observations<
-                                  volume_dim, Tags::Time, tmpl::push_back<
-                               observe_fields,
-                               ScalarWave::Tags::EnergyDensity<volume_dim>>,
-                                  analytic_solution_fields>,
-                              Events::time_events<system>>>>,
         tmpl::pair<
-            StepChooser<StepChooserUse::LtsStep>,
-            tmpl::push_back<
-                StepChoosers::standard_step_choosers<system>,
-                StepChoosers::ByBlock<StepChooserUse::LtsStep, volume_dim>>>,
+            Event,
+            tmpl::flatten<tmpl::list<
+                Events::Completion,
+                dg::Events::field_observations<
+                    volume_dim, Tags::Time,
+                    tmpl::push_back<
+                        observe_fields,
+                        ScalarWave::Tags::EnergyDensity<volume_dim>>,
+                    analytic_solution_fields>,
+                dg::Events::ObserveVolumeIntegrals<
+                    volume_dim, Tags::Time,
+                    tmpl::list<ScalarWave::Tags::EnergyDensity<volume_dim>>>,
+                Events::time_events<system>>>>,
+        tmpl::pair<StepChooser<StepChooserUse::LtsStep>,
+                   tmpl::push_back<StepChoosers::standard_step_choosers<system>,
+                                   StepChoosers::ByBlock<
+                                       StepChooserUse::LtsStep, volume_dim>>>,
         tmpl::pair<StepChooser<StepChooserUse::Slab>,
                    tmpl::push_back<StepChoosers::standard_slab_choosers<
                                        system, local_time_stepping>,
