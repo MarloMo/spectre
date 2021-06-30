@@ -70,7 +70,8 @@ struct EvolutionMetavars
         tmpl::list<gr::Tags::SpatialMetric<volume_dim, frame, DataVector>,
                    gr::Tags::InverseSpatialMetric<volume_dim, frame>,
                    gr::Tags::ExtrinsicCurvature<volume_dim, frame>,
-                   gr::Tags::SpatialChristoffelSecondKind<volume_dim, frame>>;
+                   gr::Tags::SpatialChristoffelSecondKind<volume_dim, frame>,
+                   gr::Tags::SpatialRicci<volume_dim, frame, DataVector>>;
     using compute_items_on_target = tmpl::append<
         tmpl::list<
             StrahlkorperGr::Tags::AreaElementCompute<frame>,
@@ -84,6 +85,11 @@ struct EvolutionMetavars
             StrahlkorperTags::NormalOneFormCompute<frame>,
             StrahlkorperTags::UnitNormalOneFormCompute<frame>,
             StrahlkorperTags::TangentsCompute<frame>,
+            StrahlkorperTags::UnitNormalVectorCompute<frame>,
+            StrahlkorperTags::GradUnitNormalOneFormCompute<frame>,
+            StrahlkorperGr::Tags::SpinFunctionCompute<frame>,
+            StrahlkorperTags::ExtrinsicCurvatureCompute<frame>,
+            StrahlkorperTags::RicciScalarCompute<frame>,
             StrahlkorperGr::Tags::DimensionfulSpinMagnitudeCompute<frame>>,
         tags_to_observe>;
     using compute_target_points =
@@ -100,7 +106,8 @@ struct EvolutionMetavars
   using interpolator_source_vars =
       tmpl::list<gr::Tags::SpacetimeMetric<volume_dim, frame>,
                  GeneralizedHarmonic::Tags::Pi<volume_dim, frame>,
-                 GeneralizedHarmonic::Tags::Phi<volume_dim, frame>>;
+                 GeneralizedHarmonic::Tags::Phi<volume_dim, frame>,
+                 gr::Tags::SpatialRicci<volume_dim, frame, DataVector>>;
 
   struct factory_creation
       : tt::ConformsTo<Options::protocols::FactoryCreation> {
