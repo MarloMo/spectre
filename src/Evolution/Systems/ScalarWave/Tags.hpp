@@ -106,13 +106,21 @@ struct EvolvedFieldsFromCharacteristicFields : db::SimpleTag {
   }
 };
 
-/// The energy density of the scalar wave
+/// The energy density of the scalar wave system
 template <size_t SpatialDim>
 struct EnergyDensity : db::SimpleTag {
   using type = Scalar<DataVector>;
 };
 
-/// Computes the energy density of the scalar wave
+/// @{
+/*!
+ * \brief Computes the energy density of the scalar wave system.
+ *
+ * Below is the fucntion used to calculate the energy density.
+ * \f{align*}
+ * \epsilon = \frac{1}{2}\left( \Pi^{2} + \abs{\Phi}^{2} \right)
+ * \f}
+ */
 template <size_t SpatialDim>
 struct EnergyDensityCompute : EnergyDensity<SpatialDim>, db::ComputeTag {
   using base = EnergyDensity<SpatialDim>;

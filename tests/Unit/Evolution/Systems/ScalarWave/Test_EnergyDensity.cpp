@@ -20,6 +20,8 @@
 #include "Utilities/TMPL.hpp"
 
 namespace {
+
+// Test and check that the simple and compute tags work as intended
 template <size_t SpatialDim, typename DataType>
 void test_compute_item_in_databox(const DataType& used_for_size) noexcept {
   TestHelpers::db::test_simple_tag<ScalarWave::Tags::EnergyDensity<SpatialDim>>(
@@ -27,6 +29,8 @@ void test_compute_item_in_databox(const DataType& used_for_size) noexcept {
   TestHelpers::db::test_compute_tag<
       ScalarWave::Tags::EnergyDensityCompute<SpatialDim>>("EnergyDensity");
 
+  // Creates a variable named generator that can be used to generate random
+  // values
   MAKE_GENERATOR(generator);
   std::uniform_real_distribution<> dist(-1., 1.);
 
@@ -36,6 +40,7 @@ void test_compute_item_in_databox(const DataType& used_for_size) noexcept {
       make_with_random_values<tnsr::i<DataVector, SpatialDim, Frame::Inertial>>(
           make_not_null(&generator), dist, used_for_size);
 
+  // Storing the simple and compute tags in a databox
   const auto box = db::create<
       db::AddSimpleTags<ScalarWave::Pi, ScalarWave::Phi<SpatialDim>>,
       db::AddComputeTags<ScalarWave::Tags::EnergyDensityCompute<SpatialDim>>>(
@@ -59,8 +64,6 @@ SPECTRE_TEST_CASE("Unit.Evolution.Systems.ScalarWave.EnergyDensity",
                   "[Unit][Evolution]") {
   pypp::SetupLocalPythonEnvironment local_python_env(
       "Evolution/Systems/ScalarWave/");
-  //   const Scalar<DataVector> dv(5);
-  //   test_energy_density<1>(dv);
 
   const DataVector used_for_size{3., 4., 5.};
   MAKE_GENERATOR(generator);
