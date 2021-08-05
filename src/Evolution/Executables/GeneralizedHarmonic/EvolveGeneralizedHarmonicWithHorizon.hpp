@@ -62,13 +62,16 @@ struct EvolutionMetavars
   struct AhA {
     using tags_to_observe =
         tmpl::list<StrahlkorperGr::Tags::AreaCompute<frame>,
-                   StrahlkorperGr::Tags::IrreducibleMassCompute<frame>>;
+                   StrahlkorperGr::Tags::IrreducibleMassCompute<frame>,
+                   StrahlkorperTags::MinRicciScalarCompute,
+                   StrahlkorperTags::MaxRicciScalarCompute>;
     using compute_vars_to_interpolate = ah::ComputeHorizonVolumeQuantities;
     using vars_to_interpolate_to_target =
         tmpl::list<gr::Tags::SpatialMetric<volume_dim, frame, DataVector>,
                    gr::Tags::InverseSpatialMetric<volume_dim, frame>,
                    gr::Tags::ExtrinsicCurvature<volume_dim, frame>,
-                   gr::Tags::SpatialChristoffelSecondKind<volume_dim, frame>>;
+                   gr::Tags::SpatialChristoffelSecondKind<volume_dim, frame>,
+                   gr::Tags::SpatialRicci<volume_dim, frame, DataVector>>;
     using compute_items_on_target = tmpl::append<
         tmpl::list<StrahlkorperGr::Tags::AreaElementCompute<frame>,
                    StrahlkorperTags::ThetaPhiCompute<frame>,
@@ -83,6 +86,7 @@ struct EvolutionMetavars
                    StrahlkorperTags::UnitNormalVectorCompute<frame>,
                    StrahlkorperTags::GradUnitNormalOneFormCompute<frame>,
                    StrahlkorperTags::ExtrinsicCurvatureCompute<frame>,
+                   StrahlkorperTags::RicciScalarCompute<frame>,
                    StrahlkorperGr::Tags::SpinFunctionCompute<frame>>,
         tags_to_observe>;
     using compute_target_points =
@@ -99,7 +103,10 @@ struct EvolutionMetavars
   using interpolator_source_vars =
       tmpl::list<gr::Tags::SpacetimeMetric<volume_dim, frame>,
                  GeneralizedHarmonic::Tags::Pi<volume_dim, frame>,
-                 GeneralizedHarmonic::Tags::Phi<volume_dim, frame>>;
+                 GeneralizedHarmonic::Tags::Phi<volume_dim, frame>,
+                 gr::Tags::SpatialRicci<volume_dim, frame, DataVector>,
+                 Tags::deriv<GeneralizedHarmonic::Tags::Phi<volume_dim, frame>,
+                             tmpl::size_t<3>, frame>>;
 
   struct factory_creation
       : tt::ConformsTo<Options::protocols::FactoryCreation> {
