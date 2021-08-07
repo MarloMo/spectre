@@ -61,19 +61,9 @@ struct EvolutionMetavars
   struct AhA {
     using tags_to_observe =
         tmpl::list<StrahlkorperGr::Tags::AreaCompute<frame>,
-<<<<<<< HEAD
-                   StrahlkorperGr::Tags::IrreducibleMassCompute<frame>>;
-    using compute_vars_to_interpolate = ah::ComputeHorizonVolumeQuantities;
-=======
                    StrahlkorperGr::Tags::IrreducibleMassCompute<frame>,
-                   StrahlkorperTags::MinRicciScalarCompute,
-                   StrahlkorperTags::MaxRicciScalarCompute> ;
-    using compute_items_on_source = tmpl::list<
-        gr::Tags::SpatialMetricCompute<volume_dim, frame, DataVector>,
-        ah::Tags::InverseSpatialMetricCompute<volume_dim, frame>,
-        ah::Tags::ExtrinsicCurvatureCompute<volume_dim, frame>,
-        ah::Tags::SpatialChristoffelSecondKindCompute<volume_dim, frame>>;
->>>>>>> Add tags to EvolveGeneralizedHarmonic Executable
+                   StrahlkorperGr::Tags::ChristodoulouMassCompute<frame>>;
+    using compute_vars_to_interpolate = ah::ComputeHorizonVolumeQuantities;
     using vars_to_interpolate_to_target =
         tmpl::list<gr::Tags::SpatialMetric<volume_dim, frame, DataVector>,
                    gr::Tags::InverseSpatialMetric<volume_dim, frame>,
@@ -117,7 +107,9 @@ struct EvolutionMetavars
       tmpl::list<gr::Tags::SpacetimeMetric<volume_dim, frame>,
                  GeneralizedHarmonic::Tags::Pi<volume_dim, frame>,
                  GeneralizedHarmonic::Tags::Phi<volume_dim, frame>,
-                 gr::Tags::SpatialRicci<volume_dim, frame, DataVector>>;
+                 gr::Tags::SpatialRicci<volume_dim, frame, DataVector>,
+                 Tags::deriv<GeneralizedHarmonic::Tags::Phi<volume_dim, frame>,
+                             tmpl::size_t<3>, frame>>;
 
   struct factory_creation
       : tt::ConformsTo<Options::protocols::FactoryCreation> {

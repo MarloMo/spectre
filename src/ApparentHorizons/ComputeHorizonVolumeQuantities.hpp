@@ -7,6 +7,7 @@
 
 #include "DataStructures/Tensor/TypeAliases.hpp"
 #include "Evolution/Systems/GeneralizedHarmonic/Tags.hpp"
+#include "PointwiseFunctions/GeneralRelativity/Ricci.hpp"
 #include "PointwiseFunctions/GeneralRelativity/Tags.hpp"
 
 /// \cond
@@ -58,6 +59,7 @@ struct ComputeHorizonVolumeQuantities {
       tmpl::list<gr::Tags::SpacetimeMetric<3, Frame::Inertial>,
                  GeneralizedHarmonic::Tags::Pi<3, Frame::Inertial>,
                  GeneralizedHarmonic::Tags::Phi<3, Frame::Inertial>,
+                 gr::Tags::SpatialRicci<3, Frame::Inertial, DataVector>,
                  Tags::deriv<GeneralizedHarmonic::Tags::Phi<3, Frame::Inertial>,
                              tmpl::size_t<3>, Frame::Inertial>>;
   using required_src_tags =
