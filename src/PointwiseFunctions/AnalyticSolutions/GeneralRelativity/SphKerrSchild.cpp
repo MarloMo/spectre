@@ -139,24 +139,6 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
             << *rho << "\n";
 }
 
-// template <typename DataType, typename Frame>
-// void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
-//     const gsl::not_null<Scalar<DataType>*> a_dot_x,
-//     const gsl::not_null<CachedBuffer*> cache,
-//     internal_tags::a_dot_x<DataType> /*meta*/) const noexcept {
-//   const auto& x_sph_minus_center =
-//       cache->get_var(internal_tags::x_sph_minus_center<DataType, Frame>{});
-
-//   const auto spin_a = solution_.dimensionless_spin() * solution_.mass();
-//   get(*a_dot_x) = spin_a[0] * get<0>(x_sph_minus_center) +
-//                   spin_a[1] * get<1>(x_sph_minus_center) +
-//                   spin_a[2] * get<2>(x_sph_minus_center);
-
-//   std::cout << "This is a_dot_x:"
-//             << "\n"
-//             << *a_dot_x << "\n";
-// }
-
 // Helper matrix for computing the Jacobian
 template <typename DataType, typename Frame>
 void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
@@ -363,45 +345,72 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
       }
     }
   }
+  std::cout << "this is matrix_Q:"
+            << "\n"
+            << *matrix_Q << "\n";
 }
 
-// // TEST
-// template <typename DataType, typename Frame>
-// void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
-//     const gsl::not_null<tnsr::Ij<DataType, 3, Frame>*> matrix_G1,
-//     const gsl::not_null<CachedBuffer*> cache,
-//     internal_tags::matrix_G1<DataType, Frame> /*meta*/) const noexcept {
-//   const auto spin_a = solution_.dimensionless_spin() * solution_.mass();
-//   const auto a_squared =
-//       std::inner_product(spin_a.begin(), spin_a.end(), spin_a.begin(), 0.);
-//   const auto& rho = get(cache->get_var(internal_tags::rho<DataType>{}));
-//   const auto& r = get(cache->get_var(internal_tags::r<DataType>{}));
+// TEST
+template <typename DataType, typename Frame>
+void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
+    const gsl::not_null<tnsr::Ij<DataType, 3, Frame>*> matrix_G1,
+    const gsl::not_null<CachedBuffer*> cache,
+    internal_tags::matrix_G1<DataType, Frame> /*meta*/) const noexcept {
+  const auto spin_a = solution_.dimensionless_spin() * solution_.mass();
+  const auto a_squared =
+      std::inner_product(spin_a.begin(), spin_a.end(), spin_a.begin(), 0.);
+  const auto& rho = get(cache->get_var(internal_tags::rho<DataType>{}));
+  const auto& r = get(cache->get_var(internal_tags::r<DataType>{}));
 
-//   for (size_t i = 0; i < 3; ++i) {
-//     for (size_t j = i; j < 3; ++j) {
-//       matrix_G1->get(i, j) = 1. / square(rho) / r;
-//       if (i == j) {
-//         matrix_G1->get(i, j) *= (a_squared - spin_a[i] * spin_a[j]);
-//       } else {
-//         matrix_G1->get(i, j) *= -spin_a[i] * spin_a[j];
-//       }
-//     }
-//   }
-// }
+  for (size_t i = 0; i < 3; ++i) {
+    for (size_t j = i; j < 3; ++j) {
+      matrix_G1->get(i, j) = 1. / square(rho) / r;
+      if (i == j) {
+        matrix_G1->get(i, j) *= (a_squared - spin_a[i] * spin_a[j]);
+      } else {
+        matrix_G1->get(i, j) *= -spin_a[i] * spin_a[j];
+      }
+    }
+  }
+  std::cout << "this is matrix_G1:"
+            << "\n"
+            << *matrix_G1 << "\n";
+}
 
-// // ADD TO HPP
-// template <typename DataType, typename Frame>
-// void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
-//     const gsl::not_null<Scalar<DataType>*> s_number,
-//     const gsl::not_null<CachedBuffer*> cache,
-//     internal_tags::s_number<DataType> /*meta*/) const noexcept {
-//   const auto& r_squared =
-//       get(cache->get_var(internal_tags::r_squared<DataType>{}));
-//   const auto& a_dot_x =
-//   get(cache->get_var(internal_tags::a_dot_x<DataType>{}));
+template <typename DataType, typename Frame>
+void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
+    const gsl::not_null<Scalar<DataType>*> a_dot_x,
+    const gsl::not_null<CachedBuffer*> cache,
+    internal_tags::a_dot_x<DataType> /*meta*/) const noexcept {
+  const auto& x_sph_minus_center =
+      cache->get_var(internal_tags::x_sph_minus_center<DataType, Frame>{});
 
-//   get(*s_number) = r_squared + square(a_dot_x) / r_squared;
-// }
+  const auto spin_a = solution_.dimensionless_spin() * solution_.mass();
+  get(*a_dot_x) = spin_a[0] * get<0>(x_sph_minus_center) +
+                  spin_a[1] * get<1>(x_sph_minus_center) +
+                  spin_a[2] * get<2>(x_sph_minus_center);
+
+  std::cout << "This is a_dot_x:"
+            << "\n"
+            << *a_dot_x << "\n";
+}
+
+//
+template <typename DataType, typename Frame>
+void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
+    const gsl::not_null<Scalar<DataType>*> s_number,
+    const gsl::not_null<CachedBuffer*> cache,
+    internal_tags::s_number<DataType> /*meta*/) const noexcept {
+  const auto& r_squared =
+      get(cache->get_var(internal_tags::r_squared<DataType>{}));
+  const auto& a_dot_x = get(cache->get_var(internal_tags::a_dot_x<DataType>{}));
+
+  get(*s_number) = r_squared + square(a_dot_x) / r_squared;
+
+  std::cout << "This is s_number:"
+            << "\n"
+            << *s_number << "\n";
+}
 
 // // TEST
 // template <typename DataType, typename Frame>

@@ -103,8 +103,6 @@ class SphKerrSchild : public AnalyticSolution<3_st>,
     using r = ::Tags::TempScalar<2, DataType>;
     template <typename DataType>
     using rho = ::Tags::TempScalar<3, DataType>;
-    // template <typename DataType>
-    // using a_dot_x = ::Tags::TempScalar<4, DataType>;
     template <typename DataType, typename Frame = ::Frame::Inertial>
     using matrix_F = ::Tags::TempIj<4, 3, Frame, DataType>;
     template <typename DataType, typename Frame = ::Frame::Inertial>
@@ -120,7 +118,9 @@ class SphKerrSchild : public AnalyticSolution<3_st>,
     template <typename DataType, typename Frame = ::Frame::Inertial>
     using matrix_Q = ::Tags::Tempij<10, 3, Frame, DataType>;
     template <typename DataType, typename Frame = ::Frame::Inertial>
-    using matrix_G1 = ::Tags::Tempij<12, 3, Frame, DataType>;
+    using matrix_G1 = ::Tags::Tempij<11, 3, Frame, DataType>;
+    template <typename DataType>
+    using a_dot_x = ::Tags::TempScalar<12, DataType>;
     template <typename DataType>
     using s_number = ::Tags::TempScalar<13, DataType>;
     template <typename DataType, typename Frame = ::Frame::Inertial>
@@ -183,6 +183,7 @@ class SphKerrSchild : public AnalyticSolution<3_st>,
       internal_tags::deriv_jacobian<DataType, Frame>,
       internal_tags::matrix_Q<DataType, Frame>,
       internal_tags::matrix_G1<DataType, Frame>,
+      internal_tags::a_dot_x<DataType>,
       internal_tags::s_number<DataType>,
       internal_tags::matrix_G2<DataType, Frame>,
       internal_tags::inv_jacobian<DataType, Frame>,
@@ -257,11 +258,6 @@ class SphKerrSchild : public AnalyticSolution<3_st>,
         gsl::not_null<CachedBuffer*> cache,
         internal_tags::matrix_C<DataType, Frame> /*meta*/) const noexcept;
 
-    // void operator()(gsl::not_null<Scalar<DataType>*> a_dot_x,
-    //                 gsl::not_null<CachedBuffer*> cache,
-    //                 internal_tags::a_dot_x<DataType> /*meta*/) const
-    //                 noexcept;
-
     void operator()(
         gsl::not_null<tnsr::ijK<DataType, 3, Frame>*> deriv_jacobian,
         gsl::not_null<CachedBuffer*> cache,
@@ -272,15 +268,20 @@ class SphKerrSchild : public AnalyticSolution<3_st>,
         gsl::not_null<CachedBuffer*> cache,
         internal_tags::matrix_Q<DataType, Frame> /*meta*/) const noexcept;
 
-    // void operator()(
-    //     gsl::not_null<tnsr::Ij<DataType, 3, Frame>*> matrix_G1,
-    //     gsl::not_null<CachedBuffer*> cache,
-    //     internal_tags::matrix_G1<DataType, Frame> /*meta*/) const noexcept;
+    void operator()(
+        gsl::not_null<tnsr::Ij<DataType, 3, Frame>*> matrix_G1,
+        gsl::not_null<CachedBuffer*> cache,
+        internal_tags::matrix_G1<DataType, Frame> /*meta*/) const noexcept;
 
-    // void operator()(gsl::not_null<Scalar<DataType>*> s_number,
-    //                 gsl::not_null<CachedBuffer*> cache,
-    //                 internal_tags::s_number<DataType> /*meta*/) const
-    //                 noexcept;
+    void operator()(gsl::not_null<Scalar<DataType>*> a_dot_x,
+                    gsl::not_null<CachedBuffer*> cache,
+                    internal_tags::a_dot_x<DataType> /*meta*/) const
+                    noexcept;
+
+    void operator()(gsl::not_null<Scalar<DataType>*> s_number,
+                    gsl::not_null<CachedBuffer*> cache,
+                    internal_tags::s_number<DataType> /*meta*/) const
+                    noexcept;
 
     // void operator()(
     //     gsl::not_null<tnsr::Ij<DataType, 3, Frame>*> matrix_G2,

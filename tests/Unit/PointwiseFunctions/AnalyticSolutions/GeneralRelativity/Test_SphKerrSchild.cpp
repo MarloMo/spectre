@@ -41,7 +41,7 @@ tnsr::I<DataType, 3, Frame> spatial_coords(
   auto x = make_with_value<tnsr::I<DataType, 3, Frame>>(used_for_size, 0.0);
   get<0>(x) = 1.;
   get<1>(x) = 2.;
-  get<2>(x) = 4.;
+  get<2>(x) = 3.;
   return x;
 }
 
@@ -184,9 +184,9 @@ tnsr::I<DataType, 3, Frame> spatial_coords(
 template <typename Frame, typename DataType>
 void test_sph_kerr_schild(const DataType& used_for_size) noexcept {
   // Parameters for SphKerrSchild solution that become globally available
-  const double mass = 1.0;
-  const std::array<double, 3> spin{{0.0, 0.0, 0.5}};
-  const std::array<double, 3> center{{0.0, 0.0, 0.0}};
+  const double mass = 1.01;
+  const std::array<double, 3> spin{{0.0, 0.0, .5}};
+  const std::array<double, 3> center{{1.0, 1.0, 1.0}};
 
   // Evaluate solution, instantiating a spherical kerrschild and calling
   // constructor
@@ -248,12 +248,6 @@ void test_sph_kerr_schild(const DataType& used_for_size) noexcept {
   sks_computer(make_not_null(&rho), make_not_null(&cache),
                gr::Solutions::SphKerrSchild::internal_tags::rho<DataType>{});
 
-  // // Test a_dot_x
-  // Scalar<DataType> a_dot_x(3, 0.);
-  // sks_computer(
-  //     make_not_null(&a_dot_x), make_not_null(&cache),
-  //     gr::Solutions::SphKerrSchild::internal_tags::a_dot_x<DataType>{});
-
   // matrix_F test
   tnsr::Ij<DataType, 3, Frame> matrix_F{1, 0.};
   // std::cout << "this is matrix_F:" << "\n" << matrix_F << "\n";
@@ -304,6 +298,62 @@ void test_sph_kerr_schild(const DataType& used_for_size) noexcept {
       make_not_null(&matrix_Q), make_not_null(&cache),
       gr::Solutions::SphKerrSchild::internal_tags::matrix_Q<DataType,
       Frame>{});
+
+  // Check matrix_Q with analytic solution
+  auto expected_matrix_Q =
+      make_with_value<tnsr::Ij<DataVector, 3, Frame>>(x, 0.);
+  expected_matrix_Q.get(2, 2) =
+      0.255025 /
+      ((get_element(r, 0) + get_element(rho, 0)) * get_element(rho, 0));
+  for (size_t i = 0; i < 3; ++i) {
+    for (size_t j = i; j < 3; ++j) {  // Symmetry
+      if (i == j) {
+        expected_matrix_Q.get(i, j) += get_element(r, 0) / get_element(rho, 0);
+      }
+    }
+  }
+  CHECK_ITERABLE_APPROX(matrix_Q, expected_matrix_Q);
+
+  // matrix_G1 test
+  tnsr::Ij<DataType, 3, Frame> matrix_G1{1, 0.};
+  sks_computer(make_not_null(&matrix_G1), make_not_null(&cache),
+               gr::Solutions::SphKerrSchild::internal_tags::matrix_G1<DataType,
+                                                                      Frame>{});
+
+  // check matrix_G1 with analytic solution
+  auto expected_matrix_G1 =
+      make_with_value<tnsr::Ij<DataVector, 3, Frame>>(matrix_G1, 0.);
+  expected_matrix_G1.get(1, 1) =
+      1 / ((get_element(rho, 0) * get_element(rho, 0)) * get_element(r, 0));
+  for (size_t i = 0; i < 3; ++i) {
+    for (size_t j = 0; j < 3; ++j) {
+      if (i == j) {
+        expected_matrix_G1.get(i, j) *=
+            0.255025 - get_element(spin, 1) * get_element(spin, 1);
+      } else {
+        expected_matrix_G1.get(i, j) *=
+            -get_element(spin, 1) * get_element(spin, 1);
+      }
+    }
+  }
+  CHECK_ITERABLE_APPROX(matrix_G1, expected_matrix_G1);
+
+  // a_dot_x test
+  Scalar<DataType> a_dot_x(3, 0.);
+  sks_computer(
+      make_not_null(&a_dot_x), make_not_null(&cache),
+      gr::Solutions::SphKerrSchild::internal_tags::a_dot_x<DataType>{});
+
+  // s_number test
+  Scalar<DataType> s_number(1, 0.);
+  sks_computer(
+      make_not_null(&s_number), make_not_null(&cache),
+      gr::Solutions::SphKerrSchild::internal_tags::s_number<DataType>{});
+
+  // Check s_number with analytic solution
+  auto expected_s_number =
+      make_with_value<Scalar<DataVector>>(s_number, 5.20402);
+  CHECK_ITERABLE_APPROX(s_number, expected_s_number);
 }
 
 }  // namespace
