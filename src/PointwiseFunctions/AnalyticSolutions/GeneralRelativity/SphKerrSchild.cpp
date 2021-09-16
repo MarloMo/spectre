@@ -363,7 +363,7 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
   const auto& r = get(cache->get_var(internal_tags::r<DataType>{}));
 
   for (size_t i = 0; i < 3; ++i) {
-    for (size_t j = i; j < 3; ++j) {
+    for (size_t j = 0; j < 3; ++j) {
       matrix_G1->get(i, j) = 1. / square(rho) / r;
       if (i == j) {
         matrix_G1->get(i, j) *= (a_squared - spin_a[i] * spin_a[j]);
