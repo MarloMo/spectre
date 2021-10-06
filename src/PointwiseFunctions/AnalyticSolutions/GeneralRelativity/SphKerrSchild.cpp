@@ -4,9 +4,7 @@
 #include "PointwiseFunctions/AnalyticSolutions/GeneralRelativity/SphKerrSchild.hpp"
 
 #include <cmath>  // IWYU pragma: keep
-#include <iostream>
 #include <numeric>
-#include <ostream>
 #include <typeinfo>
 #include <utility>
 
@@ -26,8 +24,6 @@
 #include "DataStructures/Tensor/Tensor.hpp"
 
 #include "Utilities/ContainerHelpers.hpp"
-
-#include <iostream>
 
 namespace gr::Solutions {
 
@@ -74,8 +70,6 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
   for (size_t d = 0; d < 3; ++d) {
     x_sph_minus_center->get(d) -= gsl::at(solution_.center(), d);
   }
-
-  std::cout << "this is x_sph_minus_center " << *x_sph_minus_center << "\n";
 }
 
 template <typename DataType, typename Frame>
@@ -90,7 +84,6 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
   for (size_t i = 1; i < 3; ++i) {
     r_squared->get() += square(x_sph_minus_center.get(i));
   }
-  std::cout << "this is r_squared " << *r_squared << "\n";
 }
 
 template <typename DataType, typename Frame>
@@ -102,8 +95,6 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
       get(cache->get_var(internal_tags::r_squared<DataType>{}));
 
   get(*r) = sqrt(r_squared);
-
-  std::cout << "this is r " << *r << "\n";
 }
 
 template <typename DataType, typename Frame>
@@ -117,8 +108,6 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
   const auto a_squared =
       std::inner_product(spin_a.begin(), spin_a.end(), spin_a.begin(), 0.);
   get(*rho) = sqrt(r_squared + a_squared);
-
-  std::cout << "this is rho " << *rho << "\n";
 }
 
 template <typename DataType, typename Frame>
@@ -147,9 +136,6 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
       }
     }
   }
-  std::cout << "this is matrix_F:"
-            << "\n"
-            << *matrix_F << "\n";
 }
 
 template <typename DataType, typename Frame>
@@ -177,9 +163,6 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
       }
     }
   }
-  std::cout << "this is matrix_P:"
-            << "\n"
-            << *matrix_P << "\n";
 }
 
 template <typename DataType, typename Frame>
@@ -204,9 +187,6 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
       }
     }
   }
-  std::cout << "this is the jacobian:"
-            << "\n"
-            << *jacobian << "\n";
 }
 
 template <typename DataType, typename Frame>
@@ -235,9 +215,6 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
       }
     }
   }
-  std::cout << "this is matrix_D:"
-            << "\n"
-            << *matrix_D << "\n";
 }
 
 template <typename DataType, typename Frame>
@@ -256,9 +233,6 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
       matrix_C->get(i, j) = matrix_D.get(i, j) - 3. * matrix_F.get(i, j);
     }
   }
-  std::cout << "this is matrix_C:"
-            << "\n"
-            << *matrix_C << "\n";
 }
 
 // TEST
@@ -295,9 +269,6 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
       }
     }
   }
-  std::cout << "this is deriv_jacobian:"
-            << "\n"
-            << *deriv_jacobian << "\n";
 }
 
 template <typename DataType, typename Frame>
@@ -321,9 +292,6 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
       }
     }
   }
-  std::cout << "this is matrix_Q:"
-            << "\n"
-            << *matrix_Q << "\n";
 }
 
 template <typename DataType, typename Frame>
@@ -338,9 +306,6 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
   get(*a_dot_x) = spin_a[0] * get<0>(x_sph_minus_center) +
                   spin_a[1] * get<1>(x_sph_minus_center) +
                   spin_a[2] * get<2>(x_sph_minus_center);
-
-  std::cout << "this is spin_a " << spin_a << "\n";
-  std::cout << "this is a_dot_x " << *a_dot_x << "\n";
 }
 
 template <typename DataType, typename Frame>
@@ -364,9 +329,6 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
       }
     }
   }
-  std::cout << "this is matrix_G1:"
-            << "\n"
-            << *matrix_G1 << "\n";
 }
 
 template <typename DataType, typename Frame>
@@ -379,10 +341,6 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
   const auto& a_dot_x = get(cache->get_var(internal_tags::a_dot_x<DataType>{}));
 
   get(*s_number) = r_squared + square(a_dot_x) / r_squared;
-
-  std::cout << "this is s_number:"
-            << "\n"
-            << *s_number << "\n";
 }
 
 template <typename DataType, typename Frame>
@@ -402,9 +360,6 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
       matrix_G2->get(i, j) = (square(rho) / r) * matrix_Q.get(i, j) / s_number;
     }
   }
-  std::cout << "this is matrix_G2:"
-            << "\n"
-            << *matrix_G2 << "\n";
 }
 
 template <typename DataType, typename Frame>
@@ -423,9 +378,6 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
       G1_dot_x->get(i) += matrix_G1.get(i, m) * x_sph_minus_center.get(m);
     }
   }
-  std::cout << "this is G1_dot_x:"
-            << "\n"
-            << *G1_dot_x << "\n";
 }
 
 template <typename DataType, typename Frame>
@@ -444,9 +396,6 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
       G2_dot_x->get(i) += matrix_G2.get(m, i) * x_sph_minus_center.get(m);
     }
   }
-  std::cout << "this is G2_dot_x:"
-            << "\n"
-            << *G2_dot_x << "\n";
 }
 
 template <typename DataType, typename Frame>
@@ -467,9 +416,6 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
           matrix_Q.get(i, j) + G1_dot_x.get(i) * G2_dot_x.get(j);
     }
   }
-  std::cout << "this is inv_jacobian:"
-            << "\n"
-            << *inv_jacobian << "\n";
 }
 
 template <typename DataType, typename Frame>
@@ -495,9 +441,6 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
       }
     }
   }
-  std::cout << "this is matrix_E1:"
-            << "\n"
-            << *matrix_E1 << "\n";
 }
 
 template <typename DataType, typename Frame>
@@ -526,10 +469,6 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
                              1. / s_number * matrix_P.get(i, j);
     }
   }
-
-  std::cout << "this is matrix_E2:"
-            << "\n"
-            << *matrix_E2 << "\n";
 }
 
 // deriv_inv_jacobian
@@ -580,9 +519,6 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
       }
     }
   }
-  std::cout << "this is deriv_inv_jacobian:"
-            << "\n"
-            << *deriv_inv_jacobian << "\n";
 }
 
 // // TEST
@@ -602,10 +538,6 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
     x_kerr_schild->get(i) = rho / r * x_sph_minus_center.get(i) -
                             spin_a[i] * a_dot_x / r / (rho + r);
   }
-
-  std::cout << "this is x_kerr_schild:"
-            << "\n"
-            << *x_kerr_schild << "\n";
 }
 
 template <typename DataType, typename Frame>
@@ -617,8 +549,10 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
   const tnsr::I<DataType, 3, Frame>& x_kerr_schild =
       cache->get_var(internal_tags::x_kerr_schild<DataType, Frame>{});
 
-  tnsr::i<DataVector, 3, Frame> cross_tensor{1, 0.};
-  tnsr::i<DataVector, 3, Frame> spin_tensor{1, 0.};
+  auto cross_tensor =
+      make_with_value<tnsr::i<DataType, 3, Frame>>(get<0>(x_kerr_schild), 0.0);
+  auto spin_tensor =
+      make_with_value<tnsr::i<DataType, 3, Frame>>(get<0>(x_kerr_schild), 0.0);
 
   for (size_t m = 0; m < get_size(get_element(x_kerr_schild, 0)); ++m) {
     for (size_t s = 0; s < 3; ++s) {
@@ -630,8 +564,6 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
       get_element(a_cross_x->get(i), m) = get_element(temp_cross_product[i], 0);
     }
   }
-
-  std::cout << "this is a_cross_x: " << *a_cross_x << "\n";
 }
 
 template <typename DataType, typename Frame>
@@ -659,7 +591,6 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
                  get_element(a_cross_x.get(i), s));
     }
   }
-  std::cout << "this is kerr_schild_l: " << *kerr_schild_l << "\n";
 }
 
 template <typename DataType, typename Frame>
@@ -685,8 +616,6 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
     }
   }
 
-  std::cout << "this is sph kerr schild l upper" << *sph_kerr_schild_l_upper
-            << "\n";
 }
 
 template <typename DataType, typename Frame>
@@ -711,9 +640,6 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
       }
     }
   }
-
-  std::cout << "this is sph kerr schild l lower" << *sph_kerr_schild_l_lower
-            << "\n";
 }
 
 template <typename DataType, typename Frame>
@@ -725,7 +651,6 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
   const auto& a_dot_x = get(cache->get_var(internal_tags::a_dot_x<DataType>{}));
 
   H->get() = solution_.mass() * cube(r) / pow(r, 4) + square(a_dot_x);
-  std::cout << "this is H: " << *H << "\n";
 }
 
 template <typename DataType, typename Frame>
@@ -776,7 +701,6 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
           get_element(jacobian.get(2, j), s) * deriv_H_z;
     }  // deriv_H in Spherical KS
   }
-  std::cout << "this is deriv_H: " << *deriv_H << "\n";
 }
 
 template <typename DataType, typename Frame>
@@ -841,7 +765,7 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
 
     for (size_t j = 0; j < 3; ++j) {
       for (size_t i = 0; i < 3; ++i) {
-        temp_deriv_l[i, j] = get_element(deriv_l->get(i + 1, j + 1), s);
+        temp_deriv_l.get(i, j) = get_element(deriv_l->get(i + 1, j + 1), s);
       }
     }
 
@@ -862,8 +786,6 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
       }
     }
   }
-
-  std::cout << "this is deriv_l: " << *deriv_l << "\n";
 }
 
 template <typename DataType, typename Frame>
@@ -876,8 +798,6 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
       cache->get_var(internal_tags::sph_kerr_schild_l_upper<DataType, Frame>{});
   get(*lapse_squared) =
       1.0 / (1.0 + 2.0 * square(sph_kerr_schild_l_upper.get(0)) * H);
-
-  std::cout << "this is lapse_squared: " << *lapse_squared << "\n";
 }
 
 template <typename DataType, typename Frame>
@@ -888,8 +808,6 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
   const auto& lapse_squared =
       get(cache->get_var(internal_tags::lapse_squared<DataType>{}));
   get(*lapse) = sqrt(lapse_squared);
-
-  std::cout << "this is lapse: " << *lapse << "\n";
 }
 
 template <typename DataType, typename Frame>
@@ -902,9 +820,6 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
       get(cache->get_var(internal_tags::lapse_squared<DataType>{}));
   get(*deriv_lapse_multiplier) =
       -square(null_vector_0_) * lapse * lapse_squared;
-
-  std::cout << "this is the deriv_lapse_multiplier: " << *deriv_lapse_multiplier
-            << "\n";
 }
 
 template <typename DataType, typename Frame>
@@ -917,8 +832,6 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
       get(cache->get_var(internal_tags::lapse_squared<DataType>{}));
 
   get(*shift_multiplier) = -2.0 * null_vector_0_ * H * lapse_squared;
-
-  std::cout << "this is the shift_multiplier: " << *shift_multiplier << "\n";
 }
 
 template <typename DataType, typename Frame>
@@ -934,8 +847,6 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
   for (size_t i = 0; i < 3; ++i) {
     shift->get(i) = shift_multiplier * sph_kerr_schild_l_upper.get(i + 1);
   }
-
-  std::cout << "this is the shift: " << *shift << "\n";
 }
 
 template <typename DataType, typename Frame>
@@ -963,7 +874,6 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
                H * deriv_l.get(m + 1, i + 1));
     }
   }
-  std::cout << "this is deriv_shift: " << *deriv_shift << "\n";
 }
 
 template <typename DataType, typename Frame>
@@ -994,7 +904,6 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
       }
     }
   }
-  std::cout << "this is the spatial metric: " << *spatial_metric << "\n";
 }
 
 template <typename DataType, typename Frame>
@@ -1024,8 +933,6 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
       }
     }
   }
-  std::cout << "this is deriv_spatial_metric: " << *deriv_spatial_metric
-            << "\n";
 }
 
 template <typename DataType, typename Frame>
@@ -1036,7 +943,6 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
     const noexcept {
   std::fill(dt_spatial_metric->begin(), dt_spatial_metric->end(), 0.);
 
-  std::cout << "this is dt_spatial_metric: " << *dt_spatial_metric << "\n";
 }
 
 template <typename DataType, typename Frame>
