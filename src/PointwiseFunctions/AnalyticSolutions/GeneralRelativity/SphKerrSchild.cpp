@@ -141,9 +141,10 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
   for (size_t i = 0; i < 3; ++i) {
     for (size_t j = 0; j < 3; ++j) {
       if (i == j) {
-        matrix_F->get(i, j) *= (a_squared - spin_a[i] * spin_a[j]);
+        matrix_F->get(i, j) *=
+            (a_squared - gsl::at(spin_a, i) * gsl::at(spin_a, j));
       } else {
-        matrix_F->get(i, j) *= -spin_a[i] * spin_a[j];
+        matrix_F->get(i, j) *= -gsl::at(spin_a, i) * gsl::at(spin_a, j);
       }
     }
   }
@@ -170,10 +171,10 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
   for (size_t i = 0; i < 3; ++i) {
     for (size_t j = 0; j < 3; ++j) {
       if (i == j) {
-        matrix_P->get(i, j) *= spin_a[i] * spin_a[j];
+        matrix_P->get(i, j) *= gsl::at(spin_a, i) * gsl::at(spin_a, j);
         matrix_P->get(i, j) += rho / r;
       } else {
-        matrix_P->get(i, j) *= spin_a[i] * spin_a[j];
+        matrix_P->get(i, j) *= gsl::at(spin_a, i) * gsl::at(spin_a, j);
       }
     }
   }
@@ -229,9 +230,10 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
   for (size_t i = 0; i < 3; ++i) {
     for (size_t j = 0; j < 3; ++j) {
       if (i == j) {
-        matrix_D->get(i, j) *= (a_squared - spin_a[i] * spin_a[j]);
+        matrix_D->get(i, j) *=
+            (a_squared - gsl::at(spin_a, i) * gsl::at(spin_a, j));
       } else {
-        matrix_D->get(i, j) *= -spin_a[i] * spin_a[j];
+        matrix_D->get(i, j) *= -gsl::at(spin_a, i) * gsl::at(spin_a, j);
       }
     }
   }
@@ -314,10 +316,10 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
     for (size_t j = 0; j < 3; ++j) {
       matrix_Q->get(i, j) = 1. / (rho + r) / rho;
       if (i == j) {
-        matrix_Q->get(i, j) *= spin_a[i] * spin_a[j];
+        matrix_Q->get(i, j) *= gsl::at(spin_a, i) * gsl::at(spin_a, j);
         matrix_Q->get(i, j) += r / rho;
       } else {
-        matrix_Q->get(i, j) *= spin_a[i] * spin_a[j];
+        matrix_Q->get(i, j) *= gsl::at(spin_a, i) * gsl::at(spin_a, j);
       }
     }
   }
@@ -358,9 +360,10 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
     for (size_t j = 0; j < 3; ++j) {
       matrix_G1->get(i, j) = 1. / square(rho) / r;
       if (i == j) {
-        matrix_G1->get(i, j) *= (a_squared - spin_a[i] * spin_a[j]);
+        matrix_G1->get(i, j) *=
+            (a_squared - gsl::at(spin_a, i) * gsl::at(spin_a, j));
       } else {
-        matrix_G1->get(i, j) *= -spin_a[i] * spin_a[j];
+        matrix_G1->get(i, j) *= -gsl::at(spin_a, i) * gsl::at(spin_a, j);
       }
     }
   }
@@ -489,9 +492,10 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
       matrix_E1->get(i, j) =
           -1. / square(rho) * (1. / r_squared + 2 / square(rho));
       if (i == j) {
-        matrix_E1->get(i, j) *= (a_squared - spin_a[i] * spin_a[j]);
+        matrix_E1->get(i, j) *=
+            (a_squared - gsl::at(spin_a, i) * gsl::at(spin_a, j));
       } else {
-        matrix_E1->get(i, j) *= -spin_a[i] * spin_a[j];
+        matrix_E1->get(i, j) *= -gsl::at(spin_a, i) * gsl::at(spin_a, j);
       }
     }
   }
@@ -568,8 +572,8 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
             matrix_D.get(i, j) * x_sph_minus_center.get(k) +
             matrix_G1.get(i, k) * G2_dot_x.get(j) +
             matrix_G2.get(k, j) * G1_dot_x.get(i) -
-            2. * a_dot_x * spin_a[k] / s_number / square(r) * G1_dot_x.get(i) *
-                G2_dot_x.get(j);
+            2. * a_dot_x * gsl::at(spin_a, k) / s_number / square(r) *
+                G1_dot_x.get(i) * G2_dot_x.get(j);
         for (size_t m = 0; m < 3; ++m) {
           deriv_inv_jacobian->get(i, j, k) +=
               matrix_E1.get(i, m) * x_sph_minus_center.get(m) *
@@ -600,7 +604,7 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
 
   for (size_t i = 0; i < 3; ++i) {
     x_kerr_schild->get(i) = rho / r * x_sph_minus_center.get(i) -
-                            spin_a[i] * a_dot_x / r / (rho + r);
+                            gsl::at(spin_a, i) * a_dot_x / r / (rho + r);
   }
 
   std::cout << "this is x_kerr_schild:"
@@ -624,7 +628,7 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
 
   for (size_t m = 0; m < get_size(get_element(x_kerr_schild, 0)); ++m) {
     for (size_t s = 0; s < 3; ++s) {
-      spin_tensor[s] = spin_a[s];
+      spin_tensor[s] = gsl::at(spin_a, s);
       cross_tensor[s] = get_element(x_kerr_schild.get(s), m);
     }
     auto temp_cross_product = cross_product(spin_tensor, cross_tensor);
@@ -657,7 +661,7 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
     for (size_t i = 0; i < 3; ++i) {
       get_element(kerr_schild_l->get(i), s) =
           den * (rboyer * get_element(x_kerr_schild.get(i), s) +
-                 get_element(a_dot_x, s) * spin_a[i] / rboyer -
+                 get_element(a_dot_x, s) * gsl::at(spin_a, i) / rboyer -
                  get_element(a_cross_x.get(i), s));
     }
   }
@@ -754,8 +758,9 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
 
     DataVector dr(3, 0.);
     for (size_t i = 0; i < 3; ++i) {
-      dr[i] = drden * (get_element(x_kerr_schild.get(i), s) +
-                       get_element(a_dot_x, s) * spin_a[i] / square(rboyer));
+      dr[i] = drden *
+              (get_element(x_kerr_schild.get(i), s) +
+               get_element(a_dot_x, s) * gsl::at(spin_a, i) / square(rboyer));
     }
 
     const double Hden = 1. / (pow(rboyer, 4) + square(get_element(a_dot_x, s)));
@@ -764,7 +769,7 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
       get_element(deriv_H->get(i + 1), s) =
           get_element(H[0], s) *
           (fac * dr[i] - 2. * Hden * get_element(a_dot_x, s) *
-                             spin_a[i]);  // deriv_H in original KS
+                             gsl::at(spin_a, i));  // deriv_H in original KS
     }
 
     const double deriv_H_x = get_element(deriv_H->get(1), s);
@@ -814,18 +819,20 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
     const double drden = get_element(H[0], s) / solution_.mass();
     DataVector dr(3, 0.);
     for (size_t i = 0; i < 3; ++i) {
-      dr[i] = drden * (get_element(x_kerr_schild.get(i), s) +
-                       get_element(a_dot_x, s) * spin_a[i] / square(rboyer));
+      dr[i] = drden *
+              (get_element(x_kerr_schild.get(i), s) +
+               get_element(a_dot_x, s) * gsl::at(spin_a, i) / square(rboyer));
     }
 
     for (size_t i = 0; i < 3; ++i) {
       for (size_t j = 0; j < 3; ++j) {
         get_element(deriv_l->get(i + 1, j + 1), s) =
-            den * ((get_element(x_kerr_schild.get(i), s) -
-                    2. * rboyer * get_element(kerr_schild_l.get(i), s) -
-                    get_element(a_dot_x, s) * spin_a[i] / square(rboyer)) *
-                       dr[j] +
-                   spin_a[i] * spin_a[j] / rboyer);
+            den *
+            ((get_element(x_kerr_schild.get(i), s) -
+              2. * rboyer * get_element(kerr_schild_l.get(i), s) -
+              get_element(a_dot_x, s) * gsl::at(spin_a, i) / square(rboyer)) *
+                 dr[j] +
+             gsl::at(spin_a, i) * gsl::at(spin_a, j) / rboyer);
         if (i == j) {
           get_element(deriv_l->get(i + 1, j + 1), s) += den * rboyer;
         } else {  //  add den*epsilon^ijk a_k
@@ -833,9 +840,11 @@ void SphKerrSchild::IntermediateComputer<DataType, Frame>::operator()(
           if (k == i) {  // j+1 = i (cyclic), so choose minus sign
             ++k;
             k %= 3;  // and set k to be neither i nor j
-            get_element(deriv_l->get(i + 1, j + 1), s) -= den * spin_a[k];
+            get_element(deriv_l->get(i + 1, j + 1), s) -=
+                den * gsl::at(spin_a, k);
           } else {  // i+1 = j (cyclic), so choose plus sign
-            get_element(deriv_l->get(i + 1, j + 1), s) += den * spin_a[k];
+            get_element(deriv_l->get(i + 1, j + 1), s) +=
+                den * gsl::at(spin_a, k);
           }
         }
       }
