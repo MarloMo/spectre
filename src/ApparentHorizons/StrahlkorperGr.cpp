@@ -731,14 +731,13 @@ Scalar<DataVector> spin_function(
 }
 
 template <typename Frame>
-double dimensionful_spin_magnitude(
-    const Scalar<DataVector>& ricci_scalar,
+void dimensionful_spin_magnitude(
+    const gsl::not_null<double*> result, const Scalar<DataVector>& ricci_scalar,
     const Scalar<DataVector>& spin_function,
     const tnsr::ii<DataVector, 3, Frame>& spatial_metric,
     const StrahlkorperTags::aliases::Jacobian<Frame>& tangents,
     const YlmSpherepack& ylm, const Scalar<DataVector>& area_element) {
   const Scalar<DataVector> sin_theta{sin(ylm.theta_phi_points()[0])};
-
   const auto surface_metric =
       get_surface_metric(spatial_metric, tangents, sin_theta);
   const auto inverse_surface_metric =
@@ -768,7 +767,22 @@ double dimensionful_spin_magnitude(
   const auto potentials =
       get_normalized_spin_potentials(smallest_eigenvectors, ylm, area_element);
 
-  return get_spin_magnitude(potentials, spin_function, area_element, ylm);
+  *result = get_spin_magnitude(potentials, spin_function, area_element, ylm);
+}
+
+template <typename Frame>
+double dimensionful_spin_magnitude(
+    const Scalar<DataVector>& ricci_scalar,
+
+    const Scalar<DataVector>& spin_function,
+    const tnsr::ii<DataVector, 3, Frame>& spatial_metric,
+    const StrahlkorperTags::aliases::Jacobian<Frame>& tangents,
+    const YlmSpherepack& ylm, const Scalar<DataVector>& area_element) {
+  double result{};
+  dimensionful_spin_magnitude(make_not_null(&result), ricci_scalar,
+                              spin_function, spatial_metric, tangents, ylm,
+                              area_element);
+  return result;
 }
 
 template <typename Frame>
