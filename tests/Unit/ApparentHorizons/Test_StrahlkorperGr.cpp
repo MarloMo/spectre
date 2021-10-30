@@ -694,6 +694,11 @@ void test_dimensionful_spin_magnitude(
   const double spin_magnitude = StrahlkorperGr::dimensionful_spin_magnitude(
       ricci_scalar, spin_function, spatial_metric, tangents, ylm, area_element);
 
+  double spin_magnitude_void = std::numeric_limits<double>::signaling_NaN();
+  StrahlkorperGr::dimensionful_spin_magnitude(
+      make_not_null(&spin_magnitude_void), ricci_scalar, spin_function,
+      spatial_metric, tangents, ylm, area_element);
+
   Approx custom_approx = Approx::custom().epsilon(tolerance).scale(1.0);
   CHECK_ITERABLE_CUSTOM_APPROX(spin_magnitude, expected, custom_approx);
 }
