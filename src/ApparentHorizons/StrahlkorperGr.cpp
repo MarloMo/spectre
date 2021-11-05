@@ -980,6 +980,14 @@ double christodoulou_mass(const double dimensionful_spin_magnitude,
       const tnsr::I<DataVector, 3, FRAME(data)>& unit_normal_vector,        \
       const Scalar<DataVector>& area_element,                               \
       const tnsr::ii<DataVector, 3, FRAME(data)>& extrinsic_curvature);     \
+  template void StrahlkorperGr::dimensionful_spin_magnitude<FRAME(data)>(   \
+      const gsl::not_null<double*> result,                                  \
+      const Scalar<DataVector>& ricci_scalar,                               \
+      const Scalar<DataVector>& spin_function,                              \
+      const tnsr::ii<DataVector, 3, FRAME(data)>& spatial_metric,           \
+      const StrahlkorperTags::aliases::Jacobian<FRAME(data)>& tangents,     \
+      const YlmSpherepack& ylm,                                             \
+      const Scalar<DataVector>& area_element);                              \
   template double StrahlkorperGr::dimensionful_spin_magnitude<FRAME(data)>( \
       const Scalar<DataVector>& ricci_scalar,                               \
       const Scalar<DataVector>& spin_function,                              \

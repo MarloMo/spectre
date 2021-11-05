@@ -701,6 +701,8 @@ void test_dimensionful_spin_magnitude(
 
   Approx custom_approx = Approx::custom().epsilon(tolerance).scale(1.0);
   CHECK_ITERABLE_CUSTOM_APPROX(spin_magnitude, expected, custom_approx);
+
+  CHECK_ITERABLE_CUSTOM_APPROX(spin_magnitude_void, expected, custom_approx);
 }
 
 template <typename Solution, typename Fr>

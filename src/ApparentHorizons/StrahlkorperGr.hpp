@@ -393,7 +393,7 @@ Scalar<DataVector> spin_function(
  */
 
 template <typename Frame>
-void dimenisonful_spin_magnitude(
+void dimensionful_spin_magnitude(
     gsl::not_null<double*> result, const Scalar<DataVector>& ricci_scalar,
     const Scalar<DataVector>& spin_function,
     const tnsr::ii<DataVector, 3, Frame>& spatial_metric,
