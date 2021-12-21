@@ -40,7 +40,7 @@ class SphKerrSchild : public AnalyticSolution<3_st>,
   struct Mass {
     using type = double;
     static constexpr Options::String help = {"Mass of the black hole"};
-    static type lower_bound() noexcept { return 0.; }
+    static type lower_bound() { return 0.; }
   };
   struct Spin {
     using type = std::array<double, volume_dim>;
@@ -59,19 +59,19 @@ class SphKerrSchild : public AnalyticSolution<3_st>,
   SphKerrSchild(double mass, Spin::type dimensionless_spin, Center::type center,
                 const Options::Context& context = {});
 
-  explicit SphKerrSchild(CkMigrateMessage* /*unused*/) noexcept {}
+  explicit SphKerrSchild(CkMigrateMessage* /*unused*/) {}
 
   SphKerrSchild() = default;
   SphKerrSchild(const SphKerrSchild& /*rhs*/) = default;
   SphKerrSchild& operator=(const SphKerrSchild& /*rhs*/) = default;
-  SphKerrSchild(SphKerrSchild&& /*rhs*/) noexcept = default;
-  SphKerrSchild& operator=(SphKerrSchild&& /*rhs*/) noexcept = default;
+  SphKerrSchild(SphKerrSchild&& /*rhs*/) = default;
+  SphKerrSchild& operator=(SphKerrSchild&& /*rhs*/) = default;
   ~SphKerrSchild() = default;
 
   template <typename DataType, typename Frame, typename... Tags>
   tuples::TaggedTuple<Tags...> variables(
       const tnsr::I<DataType, volume_dim, Frame>& x, double /*t*/,
-      tmpl::list<Tags...> /*meta*/) const noexcept {
+      tmpl::list<Tags...> /*meta*/) const {
     static_assert(
         tmpl2::flat_all_v<
             tmpl::list_contains_v<tags<DataType, Frame>, Tags>...>,
@@ -82,15 +82,15 @@ class SphKerrSchild : public AnalyticSolution<3_st>,
   }
 
   // clang-tidy: no runtime references
-  void pup(PUP::er& p) noexcept;  // NOLINT
+  void pup(PUP::er& p);  // NOLINT
 
-  SPECTRE_ALWAYS_INLINE double mass() const noexcept { return mass_; }
+  SPECTRE_ALWAYS_INLINE double mass() const { return mass_; }
   SPECTRE_ALWAYS_INLINE const std::array<double, volume_dim>& center()
-      const noexcept {
+      const  {
     return center_;
   }
   SPECTRE_ALWAYS_INLINE const std::array<double, volume_dim>&
-  dimensionless_spin() const noexcept {
+  dimensionless_spin() const  {
     return dimensionless_spin_;
   }
 
@@ -208,194 +208,193 @@ class SphKerrSchild : public AnalyticSolution<3_st>,
 
     IntermediateComputer(const SphKerrSchild& solution,
                          const tnsr::I<DataType, 3, Frame>& x,
-                         double null_vector_0) noexcept;
+                         double null_vector_0);
 
     void operator()(
         gsl::not_null<tnsr::I<DataType, 3, Frame>*> x_sph_minus_center,
         gsl::not_null<CachedBuffer*> /*cache*/,
-        internal_tags::x_sph_minus_center<DataType, Frame> /*meta*/)
-        const noexcept;
+        internal_tags::x_sph_minus_center<DataType, Frame> /*meta*/) const ;
 
     void operator()(gsl::not_null<Scalar<DataType>*> r_squared,
                     gsl::not_null<CachedBuffer*> cache,
-                    internal_tags::r_squared<DataType> /*meta*/) const noexcept;
+                    internal_tags::r_squared<DataType> /*meta*/) const;
 
     void operator()(gsl::not_null<Scalar<DataType>*> r,
                     gsl::not_null<CachedBuffer*> cache,
-                    internal_tags::r<DataType> /*meta*/) const noexcept;
+                    internal_tags::r<DataType> /*meta*/) const;
 
     void operator()(gsl::not_null<Scalar<DataType>*> rho,
                     gsl::not_null<CachedBuffer*> cache,
-                    internal_tags::rho<DataType> /*meta*/) const noexcept;
+                    internal_tags::rho<DataType> /*meta*/) const;
 
     void operator()(gsl::not_null<Scalar<DataType>*> a_dot_x,
                     gsl::not_null<CachedBuffer*> cache,
-                    internal_tags::a_dot_x<DataType> /*meta*/) const noexcept;
+                    internal_tags::a_dot_x<DataType> /*meta*/) const;
 
     void operator()(
         gsl::not_null<tnsr::Ij<DataType, 3, Frame>*> matrix_F,
         gsl::not_null<CachedBuffer*> cache,
-        internal_tags::matrix_F<DataType, Frame> /*meta*/) const noexcept;
+        internal_tags::matrix_F<DataType, Frame> /*meta*/) const;
 
     void operator()(
         gsl::not_null<tnsr::Ij<DataType, 3, Frame>*> matrix_P,
         gsl::not_null<CachedBuffer*> cache,
-        internal_tags::matrix_P<DataType, Frame> /*meta*/) const noexcept;
+        internal_tags::matrix_P<DataType, Frame> /*meta*/) const;
 
     void operator()(
         gsl::not_null<tnsr::Ij<DataType, 3, Frame>*> jacobian,
         gsl::not_null<CachedBuffer*> cache,
-        internal_tags::jacobian<DataType, Frame> /*meta*/) const noexcept;
+        internal_tags::jacobian<DataType, Frame> /*meta*/) const;
 
     void operator()(
         gsl::not_null<tnsr::Ij<DataType, 3, Frame>*> matrix_D,
         gsl::not_null<CachedBuffer*> cache,
-        internal_tags::matrix_D<DataType, Frame> /*meta*/) const noexcept;
+        internal_tags::matrix_D<DataType, Frame> /*meta*/) const;
 
     void operator()(
         gsl::not_null<tnsr::Ij<DataType, 3, Frame>*> matrix_C,
         gsl::not_null<CachedBuffer*> cache,
-        internal_tags::matrix_C<DataType, Frame> /*meta*/) const noexcept;
+        internal_tags::matrix_C<DataType, Frame> /*meta*/) const;
 
     void operator()(
         gsl::not_null<tnsr::ijK<DataType, 3, Frame>*> deriv_jacobian,
         gsl::not_null<CachedBuffer*> cache,
-        internal_tags::deriv_jacobian<DataType, Frame> /*meta*/) const noexcept;
+        internal_tags::deriv_jacobian<DataType, Frame> /*meta*/) const;
 
     void operator()(
         gsl::not_null<tnsr::Ij<DataType, 3, Frame>*> matrix_Q,
         gsl::not_null<CachedBuffer*> cache,
-        internal_tags::matrix_Q<DataType, Frame> /*meta*/) const noexcept;
+        internal_tags::matrix_Q<DataType, Frame> /*meta*/) const;
 
     void operator()(
         gsl::not_null<tnsr::Ij<DataType, 3, Frame>*> matrix_G1,
         gsl::not_null<CachedBuffer*> cache,
-        internal_tags::matrix_G1<DataType, Frame> /*meta*/) const noexcept;
+        internal_tags::matrix_G1<DataType, Frame> /*meta*/) const;
 
     void operator()(gsl::not_null<Scalar<DataType>*> s_number,
                     gsl::not_null<CachedBuffer*> cache,
-                    internal_tags::s_number<DataType> /*meta*/) const noexcept;
+                    internal_tags::s_number<DataType> /*meta*/) const;
 
     void operator()(
         gsl::not_null<tnsr::Ij<DataType, 3, Frame>*> matrix_G2,
         gsl::not_null<CachedBuffer*> cache,
-        internal_tags::matrix_G2<DataType, Frame> /*meta*/) const noexcept;
+        internal_tags::matrix_G2<DataType, Frame> /*meta*/) const;
 
     void operator()(
         gsl::not_null<tnsr::I<DataType, 3, Frame>*> G1_dot_x,
         gsl::not_null<CachedBuffer*> cache,
-        internal_tags::G1_dot_x<DataType, Frame> /*meta*/) const noexcept;
+        internal_tags::G1_dot_x<DataType, Frame> /*meta*/) const;
 
     void operator()(
         gsl::not_null<tnsr::i<DataType, 3, Frame>*> G2_dot_x,
         gsl::not_null<CachedBuffer*> cache,
-        internal_tags::G2_dot_x<DataType, Frame> /*meta*/) const noexcept;
+        internal_tags::G2_dot_x<DataType, Frame> /*meta*/) const;
 
     void operator()(
         gsl::not_null<tnsr::Ij<DataType, 3, Frame>*> inv_jacobian,
         gsl::not_null<CachedBuffer*> cache,
-        internal_tags::inv_jacobian<DataType, Frame> /*meta*/) const noexcept;
+        internal_tags::inv_jacobian<DataType, Frame> /*meta*/) const;
 
     void operator()(
         gsl::not_null<tnsr::Ij<DataType, 3, Frame>*> matrix_E1,
         gsl::not_null<CachedBuffer*> cache,
-        internal_tags::matrix_E1<DataType, Frame> /*meta*/) const noexcept;
+        internal_tags::matrix_E1<DataType, Frame> /*meta*/) const;
 
     void operator()(
         gsl::not_null<tnsr::Ij<DataType, 3, Frame>*> matrix_E2,
         gsl::not_null<CachedBuffer*> cache,
-        internal_tags::matrix_E2<DataType, Frame> /*meta*/) const noexcept;
+        internal_tags::matrix_E2<DataType, Frame> /*meta*/) const;
 
     void operator()(
         gsl::not_null<tnsr::ijK<DataType, 3, Frame>*> deriv_inv_jacobian,
         gsl::not_null<CachedBuffer*> cache,
         internal_tags::deriv_inv_jacobian<DataType, Frame> /*meta*/)
-        const noexcept;
+        const;
 
     void operator()(
         gsl::not_null<tnsr::I<DataType, 3, Frame>*> x_kerr_schild,
         gsl::not_null<CachedBuffer*> /*cache*/,
-        internal_tags::x_kerr_schild<DataType, Frame> /*meta*/) const noexcept;
+        internal_tags::x_kerr_schild<DataType, Frame> /*meta*/) const;
 
     void operator()(
         gsl::not_null<tnsr::I<DataType, 3, Frame>*> a_cross_x,
         gsl::not_null<CachedBuffer*> cache,
-        internal_tags::a_cross_x<DataType, Frame> /*meta*/) const noexcept;
+        internal_tags::a_cross_x<DataType, Frame> /*meta*/) const;
 
     void operator()(
         gsl::not_null<tnsr::I<DataType, 3, Frame>*> kerr_schild_l,
         gsl::not_null<CachedBuffer*> cache,
-        internal_tags::kerr_schild_l<DataType, Frame> /*meta*/) const noexcept;
+        internal_tags::kerr_schild_l<DataType, Frame> /*meta*/) const;
 
     void operator()(
         gsl::not_null<tnsr::I<DataType, 4, Frame>*> sph_kerr_schild_l_upper,
         gsl::not_null<CachedBuffer*> cache,
         internal_tags::sph_kerr_schild_l_upper<DataType, Frame> /*meta*/)
-        const noexcept;
+        const;
 
     void operator()(
         gsl::not_null<tnsr::i<DataType, 4, Frame>*> sph_kerr_schild_l_lower,
         gsl::not_null<CachedBuffer*> cache,
         internal_tags::sph_kerr_schild_l_lower<DataType, Frame> /*meta*/)
-        const noexcept;
+        const;
 
     void operator()(gsl::not_null<Scalar<DataType>*> H,
                     gsl::not_null<CachedBuffer*> cache,
-                    internal_tags::H<DataType> /*meta*/) const noexcept;
+                    internal_tags::H<DataType> /*meta*/) const;
 
     void operator()(
         gsl::not_null<tnsr::I<DataType, 4, Frame>*> deriv_H,
         gsl::not_null<CachedBuffer*> cache,
-        internal_tags::deriv_H<DataType, Frame> /*meta*/) const noexcept;
+        internal_tags::deriv_H<DataType, Frame> /*meta*/) const;
 
     void operator()(
         gsl::not_null<tnsr::Ij<DataType, 4, Frame>*> deriv_l,
         gsl::not_null<CachedBuffer*> cache,
-        internal_tags::deriv_l<DataType, Frame> /*meta*/) const noexcept;
+        internal_tags::deriv_l<DataType, Frame> /*meta*/) const;
 
     void operator()(
         gsl::not_null<Scalar<DataType>*> lapse_squared,
         gsl::not_null<CachedBuffer*> cache,
-        internal_tags::lapse_squared<DataType> /*meta*/) const noexcept;
+        internal_tags::lapse_squared<DataType> /*meta*/) const;
 
     void operator()(gsl::not_null<Scalar<DataType>*> lapse,
                     gsl::not_null<CachedBuffer*> cache,
-                    gr::Tags::Lapse<DataType> /*meta*/) const noexcept;
+                    gr::Tags::Lapse<DataType> /*meta*/) const;
 
     void operator()(gsl::not_null<Scalar<DataType>*> deriv_lapse_multiplier,
                     gsl::not_null<CachedBuffer*> cache,
                     internal_tags::deriv_lapse_multiplier<DataType> /*meta*/)
-        const noexcept;
+        const;
 
     void operator()(
         gsl::not_null<Scalar<DataType>*> shift_multiplier,
         gsl::not_null<CachedBuffer*> cache,
-        internal_tags::shift_multiplier<DataType> /*meta*/) const noexcept;
+        internal_tags::shift_multiplier<DataType> /*meta*/) const;
 
     void operator()(
         gsl::not_null<tnsr::I<DataType, 3, Frame>*> shift,
         gsl::not_null<CachedBuffer*> cache,
-        gr::Tags::Shift<3, Frame, DataType> /*meta*/) const noexcept;
+        gr::Tags::Shift<3, Frame, DataType> /*meta*/) const;
 
     void operator()(gsl::not_null<tnsr::iJ<DataType, 3, Frame>*> deriv_shift,
                     gsl::not_null<CachedBuffer*> cache,
-                    DerivShift<DataType, Frame> /*meta*/) const noexcept;
+                    DerivShift<DataType, Frame> /*meta*/) const;
 
     void operator()(
         gsl::not_null<tnsr::ii<DataType, 3, Frame>*> spatial_metric,
         gsl::not_null<CachedBuffer*> cache,
-        gr::Tags::SpatialMetric<3, Frame, DataType> /*meta*/) const noexcept;
+        gr::Tags::SpatialMetric<3, Frame, DataType> /*meta*/) const;
 
     void operator()(
         gsl::not_null<tnsr::ijj<DataType, 3, Frame>*> deriv_spatial_metric,
         gsl::not_null<CachedBuffer*> cache,
-        DerivSpatialMetric<DataType, Frame> /*meta*/) const noexcept;
+        DerivSpatialMetric<DataType, Frame> /*meta*/) const;
 
     void operator()(
         gsl::not_null<tnsr::ii<DataType, 3, Frame>*> dt_spatial_metric,
         gsl::not_null<CachedBuffer*> cache,
         ::Tags::dt<gr::Tags::SpatialMetric<3, Frame, DataType>> /*meta*/)
-        const noexcept;
+        const;
 
    private:
     const SphKerrSchild& solution_;
@@ -409,27 +408,27 @@ class SphKerrSchild : public AnalyticSolution<3_st>,
     using CachedBuffer = SphKerrSchild::CachedBuffer<DataType, Frame>;
 
     IntermediateVars(const SphKerrSchild& solution,
-                     const tnsr::I<DataType, 3, Frame>& x) noexcept;
+                     const tnsr::I<DataType, 3, Frame>& x);
 
     using CachedBuffer::get_var;
 
     tnsr::i<DataType, 3, Frame> get_var(
-        DerivLapse<DataType, Frame> /*meta*/) noexcept;
+        DerivLapse<DataType, Frame> /*meta*/);
 
     Scalar<DataType> get_var(
-        ::Tags::dt<gr::Tags::Lapse<DataType>> /*meta*/) noexcept;
+        ::Tags::dt<gr::Tags::Lapse<DataType>> /*meta*/);
 
     tnsr::I<DataType, 3, Frame> get_var(
-        ::Tags::dt<gr::Tags::Shift<3, Frame, DataType>> /*meta*/) noexcept;
+        ::Tags::dt<gr::Tags::Shift<3, Frame, DataType>> /*meta*/);
 
     Scalar<DataType> get_var(
-        gr::Tags::SqrtDetSpatialMetric<DataType> /*meta*/) noexcept;
+        gr::Tags::SqrtDetSpatialMetric<DataType> /*meta*/);
 
     tnsr::II<DataType, 3, Frame> get_var(
-        gr::Tags::InverseSpatialMetric<3, Frame, DataType> /*meta*/) noexcept;
+        gr::Tags::InverseSpatialMetric<3, Frame, DataType> /*meta*/);
 
     tnsr::ii<DataType, 3, Frame> get_var(
-        gr::Tags::ExtrinsicCurvature<3, Frame, DataType> /*meta*/) noexcept;
+        gr::Tags::ExtrinsicCurvature<3, Frame, DataType> /*meta*/);
 
    private:
     // Here null_vector_0 is simply -1, but if you have a boosted solution,
@@ -447,14 +446,14 @@ class SphKerrSchild : public AnalyticSolution<3_st>,
 };
 
 SPECTRE_ALWAYS_INLINE bool operator==(const SphKerrSchild& lhs,
-                                      const SphKerrSchild& rhs) noexcept {
+                                      const SphKerrSchild& rhs) {
   return lhs.mass() == rhs.mass() and
          lhs.dimensionless_spin() == rhs.dimensionless_spin() and
          lhs.center() == rhs.center();
 }
 
 SPECTRE_ALWAYS_INLINE bool operator!=(const SphKerrSchild& lhs,
-                                      const SphKerrSchild& rhs) noexcept {
+                                      const SphKerrSchild& rhs) {
   return not(lhs == rhs);
 }
 }  // namespace Solutions
