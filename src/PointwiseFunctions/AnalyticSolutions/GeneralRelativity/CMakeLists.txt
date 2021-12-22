@@ -12,6 +12,7 @@ spectre_target_sources(
   KerrHorizon.cpp
   KerrSchild.cpp
   Minkowski.cpp
+  SphKerrSchild.cpp
   Tov.cpp
   WrappedGr.cpp
   )
@@ -24,6 +25,7 @@ spectre_target_headers(
   KerrHorizon.hpp
   KerrSchild.hpp
   Minkowski.hpp
+  SphKerrSchild.hpp
   Solutions.hpp
   Tov.hpp
   WrappedGr.hpp
