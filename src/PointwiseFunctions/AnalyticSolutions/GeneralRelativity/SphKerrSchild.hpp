@@ -140,9 +140,21 @@ class SphKerrSchild : public AnalyticSolution<3_st>,
     template <typename DataType, typename Frame = ::Frame::Inertial>
     using matrix_E2 = ::Tags::TempIj<19, 3, Frame, DataType>;
     template <typename DataType, typename Frame = ::Frame::Inertial>
-    using deriv_inv_jacobian = ::Tags::TempijK<20, 3, Frame, DataType>;
+    using deriv_inv_jacobian = ::Tags::TempiJk<20, 3, Frame, DataType>;
+    template <typename DataType>
+    using H = ::Tags::TempScalar<22, DataType>;
     template <typename DataType, typename Frame = ::Frame::Inertial>
-    using x_kerr_schild = ::Tags::TempI<21, 3, Frame, DataType>;
+    using x_kerr_schild = ::Tags::TempI<23, 3, Frame, DataType>;
+    template <typename DataType, typename Frame = ::Frame::Inertial>
+    using a_cross_x = ::Tags::TempI<24, 3, Frame, DataType>;
+    template <typename DataType, typename Frame = ::Frame::Inertial>
+    using kerr_schild_l = ::Tags::TempI<25, 3, Frame, DataType>;
+    template <typename DataType, typename Frame = ::Frame::Inertial>
+    using sph_kerr_schild_l_lower = ::Tags::Tempi<26, 4, Frame, DataType>;
+    template <typename DataType, typename Frame = ::Frame::Inertial>
+    using sph_kerr_schild_l_upper = ::Tags::TempI<27, 4, Frame, DataType>;
+    template <typename DataType, typename Frame = ::Frame::Inertial>
+    using deriv_H = ::Tags::TempI<28, 4, Frame, DataType>;
   };
 
   template <typename DataType, typename Frame = ::Frame::Inertial>
@@ -165,7 +177,12 @@ class SphKerrSchild : public AnalyticSolution<3_st>,
       internal_tags::matrix_E1<DataType, Frame>,
       internal_tags::matrix_E2<DataType, Frame>,
       internal_tags::deriv_inv_jacobian<DataType, Frame>,
-      internal_tags::x_kerr_schild<DataType, Frame>>;
+      internal_tags::H<DataType>, internal_tags::x_kerr_schild<DataType, Frame>,
+      internal_tags::a_cross_x<DataType, Frame>,
+      internal_tags::kerr_schild_l<DataType, Frame>,
+      internal_tags::sph_kerr_schild_l_lower<DataType, Frame>,
+      internal_tags::sph_kerr_schild_l_upper<DataType, Frame>,
+      internal_tags::deriv_H<DataType, Frame>>;
 
   template <typename DataType, typename Frame = ::Frame::Inertial>
   class IntermediateComputer {
@@ -259,14 +276,41 @@ class SphKerrSchild : public AnalyticSolution<3_st>,
                     internal_tags::matrix_E2<DataType, Frame> /*meta*/) const;
 
     void operator()(
-        gsl::not_null<tnsr::ijK<DataType, 3, Frame>*> deriv_inv_jacobian,
+        gsl::not_null<tnsr::iJk<DataType, 3, Frame>*> deriv_inv_jacobian,
         gsl::not_null<CachedBuffer*> cache,
         internal_tags::deriv_inv_jacobian<DataType, Frame> /*meta*/) const;
+
+    void operator()(gsl::not_null<Scalar<DataType>*> H,
+                    gsl::not_null<CachedBuffer*> cache,
+                    internal_tags::H<DataType> /*meta*/) const;
 
     void operator()(
         gsl::not_null<tnsr::I<DataType, 3, Frame>*> x_kerr_schild,
         gsl::not_null<CachedBuffer*> /*cache*/,
         internal_tags::x_kerr_schild<DataType, Frame> /*meta*/) const;
+
+    void operator()(gsl::not_null<tnsr::I<DataType, 3, Frame>*> a_cross_x,
+                    gsl::not_null<CachedBuffer*> cache,
+                    internal_tags::a_cross_x<DataType, Frame> /*meta*/) const;
+
+    void operator()(
+        gsl::not_null<tnsr::I<DataType, 3, Frame>*> kerr_schild_l,
+        gsl::not_null<CachedBuffer*> cache,
+        internal_tags::kerr_schild_l<DataType, Frame> /*meta*/) const;
+
+    void operator()(
+        gsl::not_null<tnsr::i<DataType, 4, Frame>*> sph_kerr_schild_l_lower,
+        gsl::not_null<CachedBuffer*> cache,
+        internal_tags::sph_kerr_schild_l_lower<DataType, Frame> /*meta*/) const;
+
+    void operator()(
+        gsl::not_null<tnsr::I<DataType, 4, Frame>*> sph_kerr_schild_l_upper,
+        gsl::not_null<CachedBuffer*> cache,
+        internal_tags::sph_kerr_schild_l_upper<DataType, Frame> /*meta*/) const;
+
+    void operator()(gsl::not_null<tnsr::I<DataType, 4, Frame>*> deriv_H,
+                    gsl::not_null<CachedBuffer*> cache,
+                    internal_tags::deriv_H<DataType, Frame> /*meta*/) const;
 
    private:
     const SphKerrSchild& solution_;
