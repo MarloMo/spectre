@@ -7,6 +7,23 @@ import numpy as np
 # SMALL PERTUBATION (dx=dy=dz) OF F(x,y,z)
 
 
+def check_finite_difference_rank1(delta_pos_vectors, delta_neg_vectors, delta):
+
+    # pass the vectors into a list
+    delta_pos_vectors = delta_pos_vectors.tolist()
+    delta_neg_vectors = delta_neg_vectors.tolist()
+    # set lenght size
+    length = len(delta_pos_vectors)
+    derivative_tensor = []
+    for i in range(length):
+        # central difference formula
+        derivative_tensor_indexed_value = (delta_neg_vectors[i] -
+                                           delta_pos_vectors[i]) / (2 * delta)
+        derivative_tensor.append(derivative_tensor_indexed_value)
+    derivative_tensor = np.array(derivative_tensor)
+    return derivative_tensor
+
+
 def finite_difference_rank2(delta_pos_vectors, delta_neg_vectors, delta):
     '''
     Parameters

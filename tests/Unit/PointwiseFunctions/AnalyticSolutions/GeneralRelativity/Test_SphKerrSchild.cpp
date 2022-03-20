@@ -518,11 +518,19 @@ SPECTRE_TEST_CASE("Unit.PointwiseFunctions.AnalyticSolutions.Gr.SphKerrSchild",
       make_not_null(&H_pos_x_dir), make_not_null(&cache_pos_x_dir_perturbed),
       gr::Solutions::SphKerrSchild::internal_tags::H<DataVector>{});
 
+  std::cout << "This is H_pos_x_dir: "
+            << "\n"
+            << H_pos_x_dir << "\n";
+
   // H_pos_y_dir test
   Scalar<DataVector> H_pos_y_dir{3_st, 0.};
   sks_computer_pos_y_dir_perturbed(
       make_not_null(&H_pos_y_dir), make_not_null(&cache_pos_y_dir_perturbed),
       gr::Solutions::SphKerrSchild::internal_tags::H<DataVector>{});
+
+  std::cout << "This is H_pos_y_dir: "
+            << "\n"
+            << H_pos_y_dir << "\n";
 
   // H_pos_z_dir test
   Scalar<DataVector> H_pos_z_dir{3_st, 0.};
@@ -530,11 +538,19 @@ SPECTRE_TEST_CASE("Unit.PointwiseFunctions.AnalyticSolutions.Gr.SphKerrSchild",
       make_not_null(&H_pos_z_dir), make_not_null(&cache_pos_z_dir_perturbed),
       gr::Solutions::SphKerrSchild::internal_tags::H<DataVector>{});
 
+  std::cout << "This is H_pos_z_dir: "
+            << "\n"
+            << H_pos_z_dir << "\n";
+
   // H_neg_x_dir test
   Scalar<DataVector> H_neg_x_dir{3_st, 0.};
   sks_computer_neg_x_dir_perturbed(
       make_not_null(&H_neg_x_dir), make_not_null(&cache_neg_x_dir_perturbed),
       gr::Solutions::SphKerrSchild::internal_tags::H<DataVector>{});
+
+  std::cout << "This is H_neg_x_dir: "
+            << "\n"
+            << H_neg_x_dir << "\n";
 
   // H_neg_y_dir test
   Scalar<DataVector> H_neg_y_dir{3_st, 0.};
@@ -542,11 +558,19 @@ SPECTRE_TEST_CASE("Unit.PointwiseFunctions.AnalyticSolutions.Gr.SphKerrSchild",
       make_not_null(&H_neg_y_dir), make_not_null(&cache_neg_y_dir_perturbed),
       gr::Solutions::SphKerrSchild::internal_tags::H<DataVector>{});
 
+  std::cout << "This is H_neg_y_dir: "
+            << "\n"
+            << H_neg_y_dir << "\n";
+
   // H_neg_z_dir test
   Scalar<DataVector> H_neg_z_dir{3_st, 0.};
   sks_computer_neg_z_dir_perturbed(
       make_not_null(&H_neg_z_dir), make_not_null(&cache_neg_z_dir_perturbed),
       gr::Solutions::SphKerrSchild::internal_tags::H<DataVector>{});
+
+  std::cout << "This is H_neg_z_dir: "
+            << "\n"
+            << H_neg_z_dir << "\n";
 
   // x_kerr_schild test - non perturbed
   auto x_kerr_schild = spatial_coords<Frame::Inertial>(used_for_size);
@@ -933,12 +957,23 @@ SPECTRE_TEST_CASE("Unit.PointwiseFunctions.AnalyticSolutions.Gr.SphKerrSchild",
 
     // Test deriv_H by General_Finite_Difference.py
 
-    // const auto finite_diff_deriv_H =
-    //     pypp::call<tnsr::Ij<DataVector, 4, Frame::Inertial>>(
-    //         "General_Finite_Difference", "finite_difference_rank2",
-    //         x_kerr_delta_pos_vectors, x_kerr_delta_neg_vectors, delta);
+    auto H_delta_pos_vectors =
+        make_with_value<tnsr::I<double, 3, Frame::Inertial>>(1_st, 0.0);
+    H_delta_pos_vectors.get(0) = H_pos_x_dir[0][0];
+    H_delta_pos_vectors.get(1) = H_pos_y_dir[0][0];
+    H_delta_pos_vectors.get(2) = H_pos_z_dir[0][0];
 
-    // Approx custom_approx = Approx::custom().epsilon(1e-6).scale(1.0);
-    // CHECK_ITERABLE_CUSTOM_APPROX(jacobian, finite_diff_jacobian,
-    // custom_approx);
+    std::cout << "This is H_delta_pos_vectors: "
+              << "\n"
+              << H_delta_pos_vectors << "\n";
+
+    auto H_delta_neg_vectors =
+        make_with_value<tnsr::I<double, 3, Frame::Inertial>>(1_st, 0.0);
+    H_delta_neg_vectors.get(0) = H_neg_x_dir[0][0];
+    H_delta_neg_vectors.get(1) = H_neg_y_dir[0][0];
+    H_delta_neg_vectors.get(2) = H_neg_z_dir[0][0];
+
+    std::cout << "This is H_delta_neg_vectors: "
+              << "\n"
+              << H_delta_neg_vectors << "\n";
 }
