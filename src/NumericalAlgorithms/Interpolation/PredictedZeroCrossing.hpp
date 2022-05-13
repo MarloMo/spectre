@@ -5,6 +5,8 @@
 
 #include <vector>
 
+#include "DataStructures/DataVector.hpp"
+
 namespace intrp {
 
 /*!
@@ -15,5 +17,16 @@ namespace intrp {
  */
 double predicted_zero_crossing_value(const std::vector<double>& x_values,
                                      const std::vector<double>& y_values);
+
+/*!
+ * \brief Predicts the zero crossing of multiple functions contained in a vector
+ * of datavectors.
+ *
+ * Fits a linear function to a set of datavectors for different x_values
+ * and uses the fits to predict what x_values, when the y_values are zero, will
+ * be crossed for each function contained in the datavector.
+ */
+DataVector predicted_zero_crossing_value(
+    const DataVector& x_values, const std::vector<DataVector>& y_values);
 
 }  // namespace intrp

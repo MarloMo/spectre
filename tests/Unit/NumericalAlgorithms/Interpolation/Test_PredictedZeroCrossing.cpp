@@ -10,6 +10,50 @@
 #include "NumericalAlgorithms/Interpolation/LinearLeastSquares.hpp"
 #include "NumericalAlgorithms/Interpolation/PredictedZeroCrossing.hpp"
 
+namespace {
+
+void test_predicted_zero_crossing_datavector() {
+  // Set up random number generator
+  MAKE_GENERATOR(gen);
+  std::uniform_real_distribution<> dist(-10., 10.);
+  std::uniform_real_distribution<> error_dist(-1e-8, 1e-8);
+
+  DataVector expected_zero_crossing_value(3, 0.);
+  for (size_t i = 0; i < expected_zero_crossing_value.size(); ++i) {
+    expected_zero_crossing_value[i] = dist(gen);
+  }
+  CAPTURE(expected_zero_crossing_value);
+  DataVector slope(3, 0.);
+  for (size_t i = 0; i < slope.size(); ++i) {
+    slope[i] = dist(gen);
+  }
+  CAPTURE(slope);
+
+  const DataVector x_values{0., 1., 2.};
+  std::vector<DataVector> y_values{};
+
+  DataVector b(3, 0.);
+  for (size_t i = 0; i < b.size(); ++i) {
+    b[i] = -slope[i] * expected_zero_crossing_value[i];
+  }
+
+  for (size_t i = 0; i < x_values.size(); ++i) {
+    double error = error_dist(gen);
+    y_values.push_back(DataVector{slope[i] * x_values[0] + b[i] + error,
+                                  slope[i] * x_values[1] + b[i] + error,
+                                  slope[i] * x_values[2] + b[i] + error});
+  }
+
+  DataVector compute_zero_crossing_value =
+      intrp::predicted_zero_crossing_value(x_values, y_values);
+
+  Approx custom_approx = Approx::custom().epsilon(1e-6);
+  CHECK_ITERABLE_CUSTOM_APPROX(compute_zero_crossing_value,
+                               expected_zero_crossing_value, custom_approx);
+}
+
+}  // namespace
+
 SPECTRE_TEST_CASE(
     "Unit.NumericalAlgorithms.Interpolation.PredictedZeroCrossing",
     "[Unit][NumericalAlgorithms]") {
@@ -37,4 +81,7 @@ SPECTRE_TEST_CASE(
   Approx custom_approx = Approx::custom().epsilon(1.e-6);
   CHECK_ITERABLE_CUSTOM_APPROX(expected_zero_crossing_value,
                                compute_zero_crossing_value, custom_approx);
+
+  // Test the zero crossing value for a set of datavectors
+  test_predicted_zero_crossing_datavector();
 }
