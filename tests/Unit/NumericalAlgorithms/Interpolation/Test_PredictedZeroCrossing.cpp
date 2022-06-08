@@ -3,6 +3,7 @@
 
 #include "Framework/TestingFramework.hpp"
 
+#include <deque>
 #include <random>
 #include <vector>
 
@@ -23,25 +24,26 @@ void test_predicted_zero_crossing_datavector() {
     expected_zero_crossing_value[i] = dist(gen);
   }
   CAPTURE(expected_zero_crossing_value);
-  DataVector slope(3, 0.);
-  for (size_t i = 0; i < slope.size(); ++i) {
-    slope[i] = dist(gen);
+
+  std::vector<double> slope{};
+  for (size_t i = 0; i < 3; ++i) {
+    slope.push_back(dist(gen));
   }
   CAPTURE(slope);
 
-  const DataVector x_values{0., 1., 2.};
-  std::vector<DataVector> y_values{};
+  std::deque<double> x_values{0., 1., 2., 3., 4., 5., 6., 7., 8., 9.};
+  std::deque<DataVector> y_values{};
 
-  DataVector b(3, 0.);
-  for (size_t i = 0; i < b.size(); ++i) {
-    b[i] = -slope[i] * expected_zero_crossing_value[i];
+  std::vector<double> b{};
+  for (size_t i = 0; i < 3; ++i) {
+    b.push_back(-slope[i] * expected_zero_crossing_value[i]);
   }
 
   for (size_t i = 0; i < x_values.size(); ++i) {
-    double error = error_dist(gen);
-    y_values.push_back(DataVector{slope[i] * x_values[0] + b[i] + error,
-                                  slope[i] * x_values[1] + b[i] + error,
-                                  slope[i] * x_values[2] + b[i] + error});
+    y_values.push_back(
+        DataVector{slope[i] * x_values[0] + b[i] + error_dist(gen),
+                   slope[i] * x_values[1] + b[i] + error_dist(gen),
+                   slope[i] * x_values[2] + b[i] + error_dist(gen)});
   }
 
   DataVector compute_zero_crossing_value =
